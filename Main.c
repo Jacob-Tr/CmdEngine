@@ -25,7 +25,7 @@ int main(void)
 
 	INIT_SCREEN;
 
-	vector3l a = {-5, 0, 5}, b = {10, 0, 10}, c = {5, 0, 9};
+	vector3l a = {5, 0, 5}, b = {10, 0, 10}, c = {5, 0, 9};
 	vector3 xd = {10, 0, 10};
 	vector3l lol = vector3Addl(a, vector3ToVector3l(xd));
 	//printf("%lld : %lld : %lld", lol.x, lol.y, lol.z);
@@ -37,7 +37,7 @@ int main(void)
 	initPoint(&pt_two, 'b', vector3lToVector3(b));
 
 	line ln;
-	initLine(&ln, pt, pt_two);
+	initLine(&ln, pt_two, pt);
 
 	addLineToScrnBuf(main_screen_buf, ln);
 
