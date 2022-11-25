@@ -16,7 +16,7 @@ vector3f vector2fToVector3f(const vector2f vect) {return ((vector3f) {vect.x, 0,
 
 bool isValidVector2l(const vector2l vect) {return (vect.x >= 0 && vect.z >=0);}
 
-vector2 vector2lToVector2(const vector2l vect) {return ((vector2) {(int_64) vect.x, (int_64) vect.z});}
+vector2 vector2lToVector2(const vector2l vect) {return ((vector2) {(size_t) vect.x, (size_t) vect.z});}
 
 vector2l vector2Absl(vector2l vect)
 {
@@ -50,7 +50,7 @@ size_t getVctor2Difference(const vector2 a, const vector2 b)
 	return vector2Total(diff);
 }
 
-size_t getVector2Differencel(vector2l a, vector2l b) {return (longDifference(a.x, b.x) + longDifference(a.z, b.z));}
+size_t getVector2Differencel(vector2l a, vector2l b) {return ((size_t) (longDifference(a.x, b.x) + longDifference(a.z, b.z)));}
 
 bool isValidVector3l(const vector3l vect) {return (vect.x >= 0 && vect.y >= 0 && vect.x >= 0);}
 
@@ -111,10 +111,10 @@ size_t getVector3Difference(const vector3 a, const vector3 b)
 
 size_t getVector3Differencel(const vector3l a, const vector3l b)
 {
-	size_t a_total = getVector3Totall(a), b_total = getVector3Totall(b);
+	int_64 a_total = getVector3Totall(a), b_total = getVector3Totall(b);
 	
-	if(a_total > b_total) return (a_total - b_total);
-	return (b_total - a_total);
+	if(a_total > b_total) return ((size_t) (a_total - b_total));
+	return ((size_t) (b_total - a_total));
 }
 
 vector3 vector3Add(const vector3 a, const vector3 b)

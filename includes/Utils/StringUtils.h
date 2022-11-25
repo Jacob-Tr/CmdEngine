@@ -1,6 +1,8 @@
 #ifndef STR_UTILS_H
 #define STR_UTILS_H
 
+#include <string.h>
+
 #ifdef __cplusplus 
 extern "C"
 {
@@ -54,10 +56,10 @@ int_32 indexOf(const char* string, const char c, const size_t length)
             return -1;
         }
         
-        if(*(string + i) == c) return i;
+        if(*(string + i) == c) return ((int_32) i);
     }
     
-    return -1;
+    return ((int_32) -1);
 }
 
 int_32 lastIndexOf(const char* string, const char c, const size_t length)
@@ -69,16 +71,16 @@ int_32 lastIndexOf(const char* string, const char c, const size_t length)
         return -1;
     }
     
-    for(size_t i = length; i >= 0; i--) if(*(string + i) == c) return i;
+    for(size_t i = length; i <= length; i--) if(*(string + i) == c) return ((int_32) i);
     
-    return -1;
+    return ((int_32) -1);
 }
 
 int_32 nextIndexOf(const char* string, const char c, const size_t index, const size_t length)
 {
     if(index >= length)
     {
-        fprintf(stderr, "Error: nextIndexOf index [%ld] is greater than or matches length %ld.\n", index, length);
+        fprintf(stderr, "Error: nextIndexOf index [%zu] is greater than or matches length %zu.\n", index, length);
         return -1;
     }
     
@@ -88,7 +90,7 @@ int_32 nextIndexOf(const char* string, const char c, const size_t index, const s
     substring(temp, string, index, length, dest_len);
     int_32 next_index = indexOf(temp, c, dest_len);
     
-    if(next_index != -1) next_index += index;
+    if(next_index != -1) next_index += ((int_32) index);
     
     free(temp);
     return next_index;
@@ -98,13 +100,13 @@ int_32 prevIndexOf(const char* string, const char c, const size_t index, const s
 {
     if(index >= length)
     {
-        fprintf(stderr, "Error: prevIndexOf index [%ld] is greater than or matches length %ld.\n", index, length);
+        fprintf(stderr, "Error: prevIndexOf index [%zu] is greater than or matches length %zu.\n", index, length);
         return -1;
     }
     
     int_32 prev_index = lastIndexOf(string, c, index);
     
-    if(prev_index == index) prev_index = lastIndexOf(string, c, (index - 1));
+    if(prev_index == ((int_32) index)) prev_index = lastIndexOf(string, c, (index - 1));
     
     return prev_index;
 }
@@ -161,20 +163,20 @@ bool strfind(const char* string, const char* substring, int_32* begin, int_32* e
         
         if(*begin == -1)
         {
-            if(*(string + i) == *(substring)) *begin = i;
+            if(*(string + i) == *(substring)) *begin = ((int_32) i);
             continue;
         }
         
-        sub_cur = *(substring + (i - *begin));
+        sub_cur = *(substring + (((int_32) i) - *begin));
         
         if(sub_cur != current)
         {
             *begin = -1;
             continue;
         }
-        else if((*begin - i) >= sub_len)
+        else if((*begin - ((int_32) i)) >= sub_len)
         {
-            *end = (i + 1);
+            *end = (((int_32)i) + 1);
             break;
         }
     }
@@ -199,7 +201,7 @@ bool strDelMid(char* dest, const char* src, const size_t begin, const size_t end
 {
     if(begin >= end || end > length)
     {
-        fprintf(stderr, "Error: strdel could not remove substring index %ld to %ld from \"%s\".\n", begin, end, src);
+        fprintf(stderr, "Error: strdel could not remove substring index %zu to %zu from \"%s\".\n", begin, end, src);
         
         return false;
     }
@@ -288,7 +290,7 @@ bool strAdd(char* dest, const char* src, const char c, const size_t index, const
 
 bool escapeStrPrcnts(char* dest, const char* src, const size_t dest_size, const size_t src_len)
 {
-    const size_t percents = countChars(src, '\%', src_len);
+    const size_t percents = countChars(src, '%', src_len);
 
     if((dest_size + percents) < src_len)
     {
@@ -296,7 +298,7 @@ bool escapeStrPrcnts(char* dest, const char* src, const size_t dest_size, const 
         
         return false;
     }
-    size_t index = indexOf(src, '\%', src_len);
+    size_t index = indexOf(src, '%', src_len);
     
     char* temp = (char*) malloc((src_len + percents) * sizeof(char));
     snprintf(temp, src_len, "%s", src);
@@ -309,9 +311,9 @@ bool escapeStrPrcnts(char* dest, const char* src, const size_t dest_size, const 
             continue;
         }
         
-        strAdd(temp, temp, index, '\\', (src_len + percents), strlen(temp));
+        strAdd(temp, temp, '\\', index, (src_len + percents), strlen(temp));
         
-        index = nextIndexOf(temp, '\%', (index + 1), strlen(temp));
+        index = nextIndexOf(temp, '%', (index + 1), strlen(temp));
     }
     
     snprintf(dest, strlen(temp), "%s", temp);
@@ -329,7 +331,7 @@ bool isStrCompressed(const char* str, const size_t length)
 typedef char cmp_char;
 #define cmp_strlen(string) (compressedStrlen((string), strlen((string))) + 1)
 
-size_t compressedStrlen(const char* string, const size_t length);
+size_t compressedStrlen(const cmp_char* str, const size_t length);
 
 bool compressText(cmp_char* dest, const char* src, const size_t dest_size, const size_t src_len)
 {

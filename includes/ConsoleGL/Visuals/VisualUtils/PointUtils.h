@@ -31,7 +31,7 @@ void initPointS(point* pt, const char c, const vector3 vect, const size_t size)
 	pt->px = p;
 }
 
-#define empty_point ((point) {(NULL_PIXEL), (NULL_VECT3), 0, 0})
+#define empty_point {NULL_PIXEL, NULL_VECT3, 0, 0}
 FORCE_INLINE void initPoint(point* pt, const char c, const vector3 vect) {initPointS(pt, c, vect, point_size);}
 
 bool isEmptyPoint(const point pt) {return (pt.width == 0);}

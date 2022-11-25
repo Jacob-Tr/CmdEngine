@@ -1,8 +1,8 @@
 #ifndef LINUX_COMPAT_H
 #define LINUX_COMPAT_H
 
-#ifdef MSVC_VER
-    #define FORCE_INLINE static __forceinline inline
+#ifdef _MSC_VER
+    #define FORCE_INLINE static __forceinline
 #else
     #define FORCE_INLINE static __attribute__((always_inline)) inline
 #endif
@@ -10,6 +10,12 @@
 #ifdef _cplusplus
 extern "C"
 {
+#endif
+
+#if defined _MSC_VER || defined _WIN32
+	static inline void clrScr(void) {system("cls");}
+#else
+	static inline void clrScr(void) {system("clear");}
 #endif
 
 FORCE_INLINE void* betterMalloc(const size_t size)

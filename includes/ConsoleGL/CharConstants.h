@@ -14,8 +14,8 @@ const char CH_ANG ='*';
 
 const char CH_AA_UNDR = '`';
 const char CH_AA_OVR = '.';
-const char CH_AA_RGT = CH_AA_UNDR;
-const char CH_AA_LFT = CH_AA_UNDR;
+const char CH_AA_RGT = '`';
+const char CH_AA_LFT = '`';
 
 
 #endif

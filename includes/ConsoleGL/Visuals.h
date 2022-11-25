@@ -1,7 +1,7 @@
 #ifndef VISUALS_H
 #define VISUALS_H
 
-#define NULL_POINT ((point*) NULL)
+#define NULL_POINT {NULL_PIXEL, NULL_VECT3, 0, 0}
 typedef struct
 {
 	pixel px;
@@ -9,7 +9,7 @@ typedef struct
 	size_t width, height;
 } point;
 
-#define NULL_LINE ((line*) NULL)
+#define NULL_LINE {NULL_POINT, NULL_POINT, NULL_PIXEL}
 typedef struct
 {
 	point a, b;
@@ -30,7 +30,7 @@ typedef struct
 
 #include "includes/ConsoleGL/Visuals/Objects.h"
 
-#define NULL_SCREEN ((screen_buffer*) NULL)
+#define NULL_SCREEN {NULL, 0, 0}
 typedef struct 
 {
 	pixel* buffer;

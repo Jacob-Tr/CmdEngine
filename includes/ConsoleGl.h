@@ -5,6 +5,7 @@
 #include "includes/ConsoleGL/LinuxCompat.h"
 #include"includes/ConsoleGL/Primitives.h"
 #include "includes/ConsoleGL/Visuals.h"
+#include "includes/ConsoleGL/Map.h"
 
 #ifdef DEBUG
     #include "includes/ConsoleGL/Debug.h"
