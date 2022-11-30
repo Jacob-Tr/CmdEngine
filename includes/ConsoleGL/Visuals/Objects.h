@@ -13,7 +13,7 @@ extern "C"
 {
 #endif
 
-/*void initPointBuffer(object* obj)
+void initPointBuffer(object* obj) 
 {
 	obj->pts = (point*) malloc(sizeof(point) * BASE_OBJ_POINTS);
 	obj->point_arr_size = BASE_OBJ_POINTS;
@@ -68,7 +68,7 @@ void removePointFromObj(object* obj, const size_t index)
 {
 	for(size_t i = index; i < (obj->point_arr_entries - 1); i++) *((obj->pts) + i) = *((obj->pts) + (i + 1));
 	
-	*((obj->pts) + --obj->point_arr_entries) = NULL_POINT;
+	*((obj->pts) + --obj->point_arr_entries) = empty_point;
 }
 
 void resizeLineArr(object* obj)
@@ -99,7 +99,7 @@ void removeLineFromObj(object* obj, const size_t index)
 	for(size_t i = index; i < (obj->line_arr_entries - 1); i++) *((obj->lines) + i) = *((obj->lines) + (i + 1));
 	
 	empty_line(((obj->lines) + --obj->line_arr_entries));
-}*/
+}
 
 #ifdef _cplusplus
 }

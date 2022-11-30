@@ -2,17 +2,13 @@
 #define BUFFERS_H
 
 #ifndef MAX_X
-	#if defined _MSC_VER || _WIN32
-		#define MAX_X 120
-	#else
-		#define MAX_X 60
-	#endif
+    #define MAX_X 60
 #endif
 #ifndef MAX_Z
-    #define MAX_Z 45
+    #define MAX_Z 50
 #endif
 
-screen_buffer* main_screen_buf = ((screen_buffer*) NULL);
+screen_buffer* main_screen_buf = NULL_SCREEN;
 
 #ifdef __cplusplus
 extern "C"
@@ -61,6 +57,8 @@ void initBuffer(screen_buffer* buf, const size_t x_size, const size_t z_size)
 	
 	initScreenPxBuffer(buf);
 }
+
+static inline void clrScr(void) {system("clear");}
 
 void prtScr(void) 
 {

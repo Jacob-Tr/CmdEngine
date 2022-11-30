@@ -24,17 +24,32 @@ bool isvalidprecbrckt(const char c) {return ((bool) (isalphachar(c) || ismathcon
 
 bool isvalidpostcbrckt(const char c) {return ((bool) (isalphachar(c) || ismathconstant(c) || isbaseoperator(c) || (isadvancedoperator(c) && (c != '!')) || (c == '=') || (c == ')') || (c == '\0')));}
 
-bool isvalidbrckt(const char c, const char former, const char latter) {return ((bool) isbracket(c) && ((c == '(') ? (isvalidpreobrckt(former) && isvalidpostobrckt(latter)) : (isvalidprecbrckt(former) && isvalidpostcbrckt(latter))));}
+bool isvalidbrckt(const char c, const char former, const char latter) {return ((bool) isbracket(c) && ((c == '(') ? (isvalidpreobrckt(former) && (isvalidpostobrckt(latter) || (latter == '-'))) : (isvalidprecbrckt(former) && isvalidpostcbrckt(latter))));}
 
 bool isvalidprebaseoperator(const char c) {return ((bool) ismathconstant(c) || isalphachar(c) || (c == ')'));}
 
-bool isvalidpostbaseoperator(const char c) {return ((bool) ismathconstant(c) || isalphachar(c) || (c == '(') || (c == '!'));}
+bool isvalidpostbaseoperator(const char c) {return ((bool) ismathconstant(c) || isalphachar(c) || (c == '(') || (c == '!') || (c == '-'));}
 
-bool isvalidbaseoperator(const char c, const char former, const char latter) {return ((bool) isbaseoperator(c) && isvalidprebaseoperator(former) && isvalidpostbaseoperator(latter));}
+bool isvalidbaseoperator(const char c, const char former, const char latter) {return ((bool) isbaseoperator(c) && (c != '-') ? isvalidprebaseoperator(former) && isvalidpostbaseoperator(latter) : (isvalidpostbaseoperator(latter) && (former != '-')));}
 
-bool isvalidadvancedoperator(const char c, const char former, const char latter) {return ((bool) isadvancedoperator(c) && ((c != '!') ? isvalidbaseoperator('*', former, latter) : isvalidbaseoperator('*', former, latter) || isoperator(former) || (former == '=') || (former == '\0')));}
+bool isvalidadvancedoperator(const char c, const char former, const char latter) {return ((bool) isadvancedoperator(c) && ((c != '!') ? isvalidbaseoperator('*', former, latter) : isvalidbaseoperator('*', former, latter) || isoperator(former) || (former == '=') || (former == '\0') && (ismathconstant(latter) || (latter == '('))));}
 
 bool isvalidoperator(const char c, const char former, const char latter) {return ((bool) isvalidbrckt(c, former, latter) || isvalidbaseoperator(c, former, latter) || isvalidadvancedoperator(c, former, latter));}
+
+bool isnegativesign(const char* str, const size_t index, const size_t length)
+{
+	char c = *(str + index);
+	
+	if(c != '-') return false;
+	if(index == 0) return true;
+	
+	char former = *(str + (index - 1)), latter = *(str + (index + 1));
+	
+	if(!isvalidbaseoperator(c, former, latter)) return false;
+	
+	if(isoperator(former)) return true;
+	return false;
+}
 
 bool isvalidexpsn(const char* str, const size_t length)
 {
@@ -51,26 +66,22 @@ bool isvalidexpsn(const char* str, const size_t length)
 		else latter = '\0';
 		c = *(str + i);
 		
-		fprintf(stdout, "Pre: %d : c: %d : post: %d\n", (int_32) former, (int_32) c, (int_32) latter);
-		
 		if(c == '\0') break;
 		
 		if(isoperator(c))
 		{
-			fprintf(stdout, "%c is an operator\n", c);
 			if(!isvalidoperator(c, former, latter)) return false;
-			fprintf(stdout, "%c is a valid operator\n", c);
 			
 			if(isbracket(c)) 
 			{
 				if(c == '(') brackets++;
 				else brackets--;
+				
+				if(latter == '\0' && brackets != 0) return false;
 			}
 			
 			continue;
 		}
-		
-		fprintf(stdout, "%c is not an operator\n", c);
 	    
 	    if(!ismathconstant(c) && !isalphachar(c))
 	    {

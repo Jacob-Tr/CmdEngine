@@ -28,10 +28,10 @@ char* file_ext[FILE_TYPES] =
 
 char disallowed_chars[] = {':', '*',     '?', '"', '<', '>', '|'}; 
 
-#ifdef _WIN32
+#ifdef __WIN32
 
 #define MAX_DIS_NAMES 24 
-char disallowed_names[MAX_DIS_NAMES][4] = 
+char disallowed_names[MAX_DIS_NAMES][] = 
 {     
     "CON", 
     "PRN", 
@@ -80,7 +80,11 @@ bool isValidWinFileName(const char* string)
 #ifdef _WIN32
     if(doesStrContainDisallowedChars(string)) return false;
     
-    for(size_t i = 0; i < MAX_DIS_NAMES; i++) if(strMatch(string, disallowed_names[i], strlen(string))) return false;
+    for(size_t i = 0; i < MAX_DIS_NAMES; i++)
+    {
+        length = strlen(disallowed_names[i]);
+        if(strmatch(string, disallowed_names[i], strlen(string), strlen(disallowed_names[i]))) return false;
+    }
 #endif
     return true; 
 } 
@@ -172,7 +176,7 @@ file* initFile(const char* path, const char* name, const ftype type, const size_
     snprintf(f_name, length, "%s/%s%s", path, name, xtnsn);
     
     FILE* f = NULL;
-    fopen_s(&f, f_name, "R");
+    f = fopen(f_name, "R");
     
     if(f == NULL)
     {
@@ -223,7 +227,7 @@ bool FOpen(file* f, const char* mode)
         return false;
     }
     
-    freopen_s(&f->file, f->path, mode, f->file);
+    f->file = freopen(f->path, mode, f->file);
     
     if(f->file == NULL)
     {

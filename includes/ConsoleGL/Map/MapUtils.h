@@ -12,6 +12,8 @@ void newWorld(world* map, const vector3 size)
 	map->size = size;
 }
 
+
+
 #ifdef _cplusplus
 }
 #endif

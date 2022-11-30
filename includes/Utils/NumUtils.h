@@ -1,7 +1,7 @@
 #ifndef NUM_UTILS_H
 #define NUM_UTILS_H
 
-#include <math.h>
+#define repeat(iterations) for(size_t _current_macro_i_ = 0; _current_macro_i_ < iterations; _current_macro_i_++)
 
 #ifdef _cplusplus
 extern "C"
@@ -22,17 +22,43 @@ static inline float floatDifference(const float a, const float b) {return ((floa
 
 static inline size_t sizeDifference(const size_t a, const size_t b) {return ((a > b) ? (a - b) : (b - a));}
 
-static inline int_64 longDifference(const int_64 a, const int_64 b) {return ((a < 0 && b > 0) ? (longAbs(a) + b) : ((a > 0 && b < 0) ? (longAbs(b) + a) : ((longAbs(a) > longAbs(b)) ? (longAbs(a) + b) : (longAbs(b) + a))));}
+static inline size_t longDifference(const int_64 a, const int_64 b) {return ((a < 0 && b > 0) ? (longAbs(a) + b) : ((a > 0 && b < 0) ? (longAbs(b) + a) : ((longAbs(a) > longAbs(b)) ? (longAbs(a) + b) : (longAbs(b) + a))));}
 
-static inline int_32 intDifference(const int_32 a, const int_32 b) {return ((int_32) longDifference((int_64) a, (int_64) b));}
+static inline size_t intDifference(const int_32 a, const int_32 b) {return longDifference((int_64) a, (int_64) b);}
 
-static inline int_64 longExp(int_64 val, const size_t power) 
+/*static inline int_64 expl(const int_64 val, const int_64 power) 
 {
 	int_64 ret = val;
-	for(size_t i = 0; i < power; i++) ret *= val;
+	repeat(power) ret *= val;
 	
 	return ret;
 }
+
+static inline uint_64 expul(const uint_64 val, const uint_64 power)
+{
+	uint_64 ret = val;
+	repeat(power) ret *= val;
+	
+	return ret;
+}
+
+static inline int_32 expi(const int_32 val, int_32 power)
+{
+	int_32 ret = val;
+	repeat(power) ret *= val;
+	
+	return ret;
+}
+
+static inline uint_32 expui(const uint_32 val, const uint_32 power)
+{
+	uint_32 ret = val;
+	repeat(power) ret *= val;
+	
+	return ret;
+}*/
+	
+
 
 #ifdef _cplusplus
 }

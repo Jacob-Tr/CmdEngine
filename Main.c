@@ -4,39 +4,25 @@
 #define __CHAR_PTR_SIZE__ 4
 #include "includes/Utils.h"
 #define DEBUG
-#include "includes/ConsoleGl.h"
-
-#define NULL_T (test_type) {' '}
-typedef struct
-{
-	pixel lol;
-} test_type;
+#include "includes/Calculate.h"
+//#include "includes/ConsoleGl.h"
 
 int main(void)
 {
-	test_type* t = NULL;
-	*t = NULL_T;
-
-
-	setPointSize(1);
-
-	INIT_SCREEN;
-
-	vector3l a = {5, 0, 5}, b = {10, 0, 10}, c = {5, 0, 9};
-
-	point pt;
-	point pt_two;
-
-	initPoint(&pt, 'y', vector3lToVector3(a));
-	initPoint(&pt_two, 'b', vector3lToVector3(b));
-
-	line ln;
-	initLine(&ln, pt_two, pt);
-
-	addLineToScrnBuf(main_screen_buf, ln);
-
-	START:
-	prtScr();
-	goto START;
+    char* expr = "!5+-(-a(6))", oper = '!';
+    
+    /*fprintf(stdout, "Valid base operator: %s\n", (isvalidbaseoperator(oper, '\0', '\0') ? "true" : "false"));
+    fprintf(stdout, "Valid advanced operator: %s\n", (isvalidadvancedoperator(oper, '\0', '\0') ? "true" : "false"));*/
+    
+    //int_32 open = -1, close = -1;
+    
+    char* str = (char*) malloc(sizeof(char) * 64);
+    solve(str, expr, 64, strlen(str));
+    //strAdd(str, expr, '*', 11, 64, strlen(expr));
+    
+    fprintf(stdout, "%s = %s\n", expr, str);
+    //fprintf(stdout, "%d", findBrcktMatch(expr, 11, strlen(expr)));
+    //fprintf(stdout, "%s", (isvalidexpsn(expr, strlen(expr)) ? "true" : "false"));
+    
 	return 0;
 }
