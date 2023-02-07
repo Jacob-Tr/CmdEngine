@@ -12,7 +12,6 @@ size_t getLineWidth(void) {return line_width;}
 
 void setLineWidth(const size_t size) {line_width = size;}
 
-#define empty_line(ln) initLine((ln), empty_point, empty_point)
 void initLine(line* ln, const point a, const point b)
 {
 	ln->a = a;
@@ -24,7 +23,7 @@ void destroyLine(line* ln)
 	destroyPoint(ln->a);
 	destroyPoint(ln->b);
 	
-	empty_line(ln);
+	*ln = EMPTY_LINE;
 }
 
 #ifdef _cplusplus

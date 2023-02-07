@@ -12,6 +12,10 @@ bool isbaseoperator(const char c) {return ((bool) (c == '/') ||  (c == '*')/* ||
 
 bool isadvancedoperator(const char c) {return ((bool) (c == '^') || (c == '!') || (c == '%'));}
 
+bool isprefixoperator(const char c) {return ((bool) (c == '!') || (c == '('));}
+
+bool issuffixoperator(const char c) {return ((bool) (c== ')'));}
+
 bool isbracket(const char c) {return ((bool) (c == '(') || (c == ')'));}
 
 bool isoperator(const char c) {return ((bool) isbaseoperator(c) || isadvancedoperator(c) || isbracket(c));}
@@ -50,6 +54,8 @@ bool isnegativesign(const char* str, const size_t index, const size_t length)
 	if(isoperator(former)) return true;
 	return false;
 }
+
+bool isnumericoperator(const char* str, const size_t index, const size_t length) {return isnegativesign(str, index, length);}
 
 bool isvalidexpsn(const char* str, const size_t length)
 {

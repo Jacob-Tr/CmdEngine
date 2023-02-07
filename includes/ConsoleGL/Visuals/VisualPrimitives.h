@@ -1,7 +1,7 @@
 #ifndef VISUAL_PRIMITIVES_H
 #define VISUAL_PRIMITIVES_H
 
-#define NULL_ORIENTATION ((orientation) {NULL_VECT3, NULL_VECT2F, ((float) 0.0)})
+#define EMPTY_ORIENTATION {.pos = EMPTY_VECT3, .direction = EMPTY_VECT2F, .rot = 0.0F}
 typedef struct 
 {
 	vector3 pos;
@@ -9,7 +9,7 @@ typedef struct
 	float rot;
 } orientation;
 
-#define NULL_POLY ((poly) {NULL_POINT, ((size_t) 0)})
+#define EMPTY_POLY ((poly) {NULL_POINT, ((size_t) 0)})
 typedef struct
 {
 	point* pt_buf;

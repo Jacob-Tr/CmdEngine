@@ -1,7 +1,7 @@
 #ifndef NUM_UTILS_H
 #define NUM_UTILS_H
 
-#define repeat(iterations) for(size_t _current_macro_i_ = 0; _current_macro_i_ < iterations; _current_macro_i_++)
+#define repeat(iterations) for(size_t _current_macro_i_ = 0; _current_macro_i_ < (iterations); _current_macro_i_++)
 
 #ifdef _cplusplus
 extern "C"
@@ -25,6 +25,8 @@ static inline size_t sizeDifference(const size_t a, const size_t b) {return ((a 
 static inline size_t longDifference(const int_64 a, const int_64 b) {return ((a < 0 && b > 0) ? (longAbs(a) + b) : ((a > 0 && b < 0) ? (longAbs(b) + a) : ((longAbs(a) > longAbs(b)) ? (longAbs(a) + b) : (longAbs(b) + a))));}
 
 static inline size_t intDifference(const int_32 a, const int_32 b) {return longDifference((int_64) a, (int_64) b);}
+
+#include "includes/Utils/Numbers/Degrees.h"
 
 /*static inline int_64 expl(const int_64 val, const int_64 power) 
 {

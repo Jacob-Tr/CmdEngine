@@ -20,8 +20,8 @@ void setPointPixel(point pt, const pixel new_px, const size_t x, const size_t y)
 
 void initPointS(point* pt, const char c, const vector3 vect, const size_t size)
 {
-	pt->width = size;
-	pt->height = size;
+	pt->size.x = size;
+	pt->size.z = size;
 	
 	pt->vect = vect;
 	
@@ -31,15 +31,14 @@ void initPointS(point* pt, const char c, const vector3 vect, const size_t size)
 	pt->px = p;
 }
 
-#define empty_point ((point) {(NULL_PIXEL), (NULL_VECT3), 0, 0})
 FORCE_INLINE void initPoint(point* pt, const char c, const vector3 vect) {initPointS(pt, c, vect, point_size);}
 
-bool isEmptyPoint(const point pt) {return (pt.width == 0);}
+bool isEmptyPoint(const point pt) {return (pt.size.x == 0);}
 
 void destroyPoint(point pt) 
 {
-	pt.width = 0;
-	pt.height = 0;
+	pt.size.x = 0;
+	pt.size.z = 0;
 }
 
 void setPointPixel(point* pt, const pixel px) {pt->px = px;}

@@ -1,14 +1,16 @@
 #ifndef VISUALS_H
 #define VISUALS_H
 
+#define EMPTY_POINT ((point) {.px = EMPTY_PIXEL, .vect = EMPTY_VECT3, .size = EMPTY_VECT2})
 #define NULL_POINT ((point*) NULL)
 typedef struct
 {
 	pixel px;
 	vector3 vect;
-	size_t width, height;
+	vector2 size;
 } point;
 
+#define EMPTY_LINE ((line) {.a = EMPTY_POINT, .b = EMPTY_POINT, .c = ((char) '\0')})
 #define NULL_LINE ((line*) NULL)
 typedef struct
 {
@@ -21,7 +23,7 @@ typedef struct
 
 typedef struct
 {
-	size_t obj_x, obj_y, obj_z;
+	vector3 pos;
 	point* pts;
 	size_t point_arr_size, point_arr_entries;
 	line* lines;
@@ -30,11 +32,12 @@ typedef struct
 
 #include "includes/ConsoleGL/Visuals/Objects.h"
 
+#define EMPTY_SCREEN ((screen_buffer) {.buffer = NULL_PIXEL, .size = EMPTY_VECT2})
 #define NULL_SCREEN ((screen_buffer*) NULL)
 typedef struct 
 {
 	pixel* buffer;
-	size_t buf_x_size, buf_z_size;
+	vector2 size;
 } screen_buffer;
 
 #include "includes/ConsoleGL/Visuals/VisualPrimitives.h"

@@ -1,9 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#define SHORT_TYPE_NAMES
-
+#include "includes/Utils/TopLevelCompat.h"
 #include "includes/Utils/SafeTypes.h"
+#include "includes/Utils/Debug.h"
+#include "includes/Utils/Compat.h"
 #include "includes/Utils/NumUtils.h"
 #include "includes/Utils/StringUtils.h"
 #include "includes/Utils/MathStrUtils.h"

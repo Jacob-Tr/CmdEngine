@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-void addPointToScrnBuf(screen_buffer* buf, const point pt) {for(size_t i = getPointZ(pt); i < (getPointZ(pt) + pt.height); i++) for(size_t ii = getPointX(pt); ii < (getPointX(pt) + pt.width); ii++) setScreenBufPixel(buf, pt.px, ii, i);}
+void addPointToScrnBuf(screen_buffer* buf, const point pt) {for(size_t i = getPointZ(pt); i < (getPointZ(pt) + pt.size.z); i++) for(size_t ii = getPointX(pt); ii < (getPointX(pt) + pt.size.x); ii++) setScreenBufPixel(buf, pt.px, ii, i);}
 
 /*vector2 getNextClosest2DNode(const vector2 a, const vector2 b)
 {
@@ -18,7 +18,7 @@ void addPointToScrnBuf(screen_buffer* buf, const point pt) {for(size_t i = getPo
 vector2 getClosestNode2D(const vector2 a, const vector2 b)
 {
 	bool ignore[] = {(a.x == b.x), (a.z == b.z)}, skip = false;
-	vector2l ret = NULL_VECT2L, lowest = NULL_VECT2L;
+	vector2l ret = EMPTY_VECT2L, lowest = EMPTY_VECT2L;
 	int_64 prev_diff = getVector2Differencel(vector2ToVector2l(a), vector2ToVector2l(b));
 	
 	for(size_t i = 0; i < 9; i++)
@@ -58,7 +58,7 @@ vector2 getClosestNode2D(const vector2 a, const vector2 b)
 vector3 getNextClosestNode(const vector3 a, const vector3 b)
 {
 	bool ignore[] = {(a.x == b.x), (a.y == b.y), (a.z == b.z)};
-	vector3l ret = NULL_VECT3L, lowest = NULL_VECT3L;
+	vector3l ret = EMPTY_VECT3L, lowest = EMPTY_VECT3L;
 	int_64 prev_diff = getVector3Differencel(vector3ToVector3l(a), vector3ToVector3l(b));
 	uint_8 skip = 0;
 	
@@ -183,7 +183,7 @@ void drawLine(screen_buffer* buf, const pixel set_px, const vector3 a, const vec
 	for(size_t i = 0; i < getVector3Difference(a, b); i++)
 	{
 		node = getNextClosestNode(node, b);       if(getVector3Difference(node, b) == 0) break;
-		if((node.x > buf->buf_x_size) || (node.z > buf->buf_z_size)) continue;
+		if((node.x > buf->size.x) || (node.z > buf->size.z)) continue;
 		printf("Closest: %zu : %zu : %zu\n", node.x, node.y, node.z);
 		
 		setScreenBufPixel(buf, set_px, node.x, node.z);

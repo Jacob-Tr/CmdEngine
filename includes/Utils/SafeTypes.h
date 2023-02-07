@@ -4,22 +4,27 @@
 #include <inttypes.h>
 #include <limits.h>
 
-#ifndef __CHAR_PTR_SIZE__
-    #error "__CHAR_PTR_SIZE__ not defined."
+#ifndef __PTR_SIZE__
+    #error "__PTR_SIZE__ not defined."
 #endif
 
-#if (__CHAR_PTR_SIZE__ == 1)
+#if (__PTR_SIZE__ == 1)
     #define __8BIT__
-#elif (__CHAR_PTR_SIZE__ == 2)
+#elif (__PTR_SIZE__ == 2)
     #define __16BIT__
-#elif (__CHAR_PTR_SIZE__ == 4)
+#elif (__PTR_SIZE__ == 4)
     #define __32BIT__
-#elif (__CHAR_PTR_SIZE__ == 8)
+#elif (__PTR_SIZE__ == 8)
     #define __64BIT__
 #endif
 
+#if _MSC_VER
+    #define int8_t byte
+#else
+    typedef int8_t byte;
+#endif
+
 typedef uint8_t ubyte;
-typedef int8_t byte;
 
 /*#ifdef __64BIT__
     typedef unsigned long long uint_128_t;
@@ -54,10 +59,10 @@ typedef int8_t byte;
 #endif*/
 
 #ifdef SHORT_TYPE_NAMES
-    #ifdef __64BIT__
+    /*#ifdef __64BIT__
         typedef uint128_t uint_128;
         typedef int128_t int_128;
-    #endif
+    #endif*/
     #if defined __32BIT__ || defined __64BIT__
         typedef uint64_t uint_64;
         typedef int64_t int_64;
@@ -68,9 +73,18 @@ typedef int8_t byte;
     #endif
     typedef uint16_t uint_16;
     typedef int16_t int_16;
-    typedef uint8_t uint_8;
-    typedef int8_t int_8;
+    typedef ubyte uint_8;
+    #ifdef _MSC_VER
+        typedef __int8 int_8;
+    #else
+        typedef int8_t int_8;
+    #endif
 #endif
+
+/*#if (CHAR_MAX == 127)
+    #define schar char
+    #define char uchar
+#endif*/
 
 #ifdef __cplusplus
 extern "C"
@@ -82,7 +96,7 @@ extern "C"
     typedef uint8_t bool;
 #endif
 
-bool isBigEdian()
+static inline bool isBigEdian()
 {
     uint32_t a = (UINT_MAX / 2), b = (a << 1);
     

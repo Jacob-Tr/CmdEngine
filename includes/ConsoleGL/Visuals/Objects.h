@@ -31,9 +31,9 @@ object newObject(const size_t x, const size_t y, const size_t z)
 {
 	object obj;
 	
-	obj.obj_x = x;
-	obj.obj_y = y;
-	obj.obj_z = z;
+	obj.pos.x = x;
+	obj.pos.y = y;
+	obj.pos.z = z;
 	
 	initPointBuffer(&obj);
 	initLineBuffer(&obj);
@@ -68,7 +68,7 @@ void removePointFromObj(object* obj, const size_t index)
 {
 	for(size_t i = index; i < (obj->point_arr_entries - 1); i++) *((obj->pts) + i) = *((obj->pts) + (i + 1));
 	
-	*((obj->pts) + --obj->point_arr_entries) = empty_point;
+	*((obj->pts) + --obj->point_arr_entries) = EMPTY_POINT;
 }
 
 void resizeLineArr(object* obj)
@@ -98,7 +98,7 @@ void removeLineFromObj(object* obj, const size_t index)
 {
 	for(size_t i = index; i < (obj->line_arr_entries - 1); i++) *((obj->lines) + i) = *((obj->lines) + (i + 1));
 	
-	empty_line(((obj->lines) + --obj->line_arr_entries));
+	*((obj->lines) + --obj->line_arr_entries) = EMPTY_LINE;
 }
 
 #ifdef _cplusplus

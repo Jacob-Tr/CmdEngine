@@ -16,9 +16,11 @@ bool isnumeric(const char* str, const size_t length)
 
 bool isalphachar(const char c) {return ((bool) (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));}
 
+bool ispunctuation(const char c) {return (c == '.' || c == '\'' || c == '"' || c == ':' || c == ';' || c == '!' || c == '?' || c == '(' || c == ')' || c == ',' || c == '/');}
+
 bool isalphastr(const char* str, const size_t length) 
 {
-	for(size_t i = 0; i < length; i++) if(!isalphachar(*(str + i)) return false);
+	for(size_t i = 0; i < length; i++) if(!isalphachar(*(str + i))) return false;
 	return true;
 }
 
@@ -28,7 +30,11 @@ bool isalphanumeric(const char* str, const size_t length)
 	for(size_t i = 0; i < length; i++)
 	{
 		c = *(str + i);
-		if(c == '\0') break;
+		if(c == '\0') 
+		{
+			if(i == 0) return false;
+			break;
+		}
 		
 		if(!isnumber(c) && !isalphachar(c)) return false;
 	}
@@ -43,12 +49,16 @@ bool substring(char* dest, const char* src, const size_t begin, const size_t end
     {
         end_override = strlen(src);
         
-        fprintf(stderr, "Warning: substring turnicated specified end [%zu] to string length [%zu] for string \"%s\".\n", end, end_override, src);
+        #ifdef DEBUG
+            fprintf(stderr, "Warning: substring turnicated specified end [%zu] to string length [%zu] for string \"%s\".\n", end, end_override, src);
+        #endif
     }
     
     if(begin >= end_override)
     {
-        fprintf(stderr, "Warning: substring could not derive string %zu to %zu in string \"%s\".\n", begin, end_override, src);
+    	#ifdef DEBUG
+            fprintf(stderr, "Warning: substring could not derive string %zu to %zu in string \"%s\".\n", begin, end_override, src);
+        #endif
         
         snprintf(dest, dest_size, "%s", src);
         return true;
@@ -56,7 +66,9 @@ bool substring(char* dest, const char* src, const size_t begin, const size_t end
     
     if(dest_size < ((end_override) - begin))
     {
-        fprintf(stderr, "Error: Substring could not extract index range %zu to %zu of string \"%s\" into destination of provided size %zu.\n", begin, end_override, src, dest_size);
+    	#ifdef DEBUG
+            fprintf(stderr, "Error: Substring could not extract index range %zu to %zu of string \"%s\" into destination of provided size %zu.\n", begin, end_override, src, dest_size);
+        #endif
         
         return false;
     }
@@ -76,7 +88,7 @@ int_32 indexOf(const char* string, const char c, const size_t length)
             return -1;
         }
         
-        if(*(string + i) == c) return i;
+        if(*(string + i) == c) return ((int_32) i);
     }
     
     return -1;
@@ -91,7 +103,7 @@ int_32 lastIndexOf(const char* string, const char c, const size_t length)
         return -1;
     }
     
-    for(size_t i = length; i >= 0; i--) if(*(string + i) == c) return i;
+    for(size_t i = (length - 1); i < length; i--) if(*(string + i) == c) return ((int_32) i);
     
     return -1;
 }
@@ -100,17 +112,17 @@ int_32 nextIndexOf(const char* string, const char c, const size_t index, const s
 {
     if(index >= length)
     {
-        fprintf(stderr, "Error: nextIndexOf index [%ld] is greater than or matches length %ld.\n", index, length);
+        fprintf(stderr, "Error: nextIndexOf index [%zu] is greater than or matches length %zu.\n", index, length);
         return -1;
     }
     
     const size_t dest_len = (length - index);
     char* temp = (char*) malloc(dest_len * sizeof(char));
     
-    substring(temp, string, (index), length, dest_len);
+    substring(temp, string, index, length, dest_len);
     int_32 next_index = indexOf(temp, c, dest_len);
     
-    if(next_index != -1) next_index += index;
+    if(next_index != -1) next_index += ((int_32) index);
     
     free(temp);
     return next_index;
@@ -120,7 +132,9 @@ int_32 prevIndexOf(const char* string, const char c, const size_t index, const s
 {
     if(index >= length)
     {
-        fprintf(stderr, "Error: prevIndexOf index [%ld] is greater than or matches length %ld.\n", index, length);
+    	#ifdef DEBUG
+            fprintf(stderr, "Error: prevIndexOf index [%zu] is greater than or matches length %zu.\n", index, length);
+        #endif
         return -1;
     }
     
@@ -183,7 +197,7 @@ bool strfind(const char* string, const char* substring, int_32* begin, int_32* e
         
         if(*begin == -1)
         {
-            if(*(string + i) == *(substring)) *begin = i;
+            if(*(string + i) == *(substring)) *begin = ((int_32) i);
             continue;
         }
         
@@ -196,7 +210,7 @@ bool strfind(const char* string, const char* substring, int_32* begin, int_32* e
         }
         else if((*begin - i) >= sub_len)
         {
-            *end = (i + 1);
+            *end = (((int_32) i) + 1);
             break;
         }
     }
@@ -221,15 +235,17 @@ bool strDelMid(char* dest, const char* src, const size_t begin, const size_t end
 {
     if(begin >= end || end > length)
     {
-        fprintf(stderr, "Error: strdel could not remove substring index %ld to %ld from \"%s\".\n", begin, end, src);
+    	#ifdef DEBUG
+            fprintf(stderr, "Error: strdel could not remove substring index %zu to %zu from \"%s\".\n", begin, end, src);
+        #endif
         
         return false;
     }
     
     char* new_str = (char*) malloc((length - (end - begin)) * sizeof(char));
     
-    snprintf(new_str, (begin + 1), "%s", src);
-    snprintf((new_str + (begin)), length, "%s", (src + end));
+    snprintf(new_str, begin, "%s", src);
+    snprintf((new_str + (begin + 1)), length, "%s", (src + end));
     
     snprintf(dest, length, "%s", new_str);
     
@@ -252,14 +268,13 @@ bool strInsert(char* dest, const char* src_one, const char* src_two, const size_
 	char* temp = (char*) malloc(sizeof(char) * dest_size);
 	
 	if(index != 0) substring(temp, src_one, 0, index, one_len);
-	substring((temp + index), src_two, two_len, two_len);
-	substring((temp + (strlen(src_two) + index)), src_one, index, one_len);
+	substring((temp + index), src_two, 0, two_len, two_len);
+	substring((temp + (strlen(src_two) + index)), src_one, index, one_len, (one_len - index));
 	
 	snprintf(dest, dest_size, "%s", temp);
 	free(temp);
 	
 	return true;
-}
 }
 
 bool strContainsChar(const char* string, const char ch, const size_t length) {return (indexOf(string, ch, length) != -1);}
@@ -332,9 +347,9 @@ bool strAdd(char* dest, const char* src, const char c, const size_t index, const
     return true;
 }
 
-bool escapeStrPrcnts(char* dest, const char* src, const size_t dest_size, const size_t src_len)
+/*bool escapeStrPrcnts(char* dest, const char* src, const size_t dest_size, const size_t src_len)
 {
-    const size_t percents = countChars(src, '\%', src_len);
+    const size_t percents = countChars(src, '%', src_len);
 
     if((dest_size + percents) < src_len)
     {
@@ -342,7 +357,7 @@ bool escapeStrPrcnts(char* dest, const char* src, const size_t dest_size, const 
         
         return false;
     }
-    size_t index = indexOf(src, '\%', src_len);
+    size_t index = indexOf(src, '%', src_len);
     
     char* temp = (char*) malloc((src_len + percents) * sizeof(char));
     snprintf(temp, src_len, "%s", src);
@@ -357,7 +372,7 @@ bool escapeStrPrcnts(char* dest, const char* src, const size_t dest_size, const 
         
         strAdd(temp, temp, index, '\\', (src_len + percents), strlen(temp));
         
-        index = nextIndexOf(temp, '\%', (index + 1), strlen(temp));
+        index = nextIndexOf(temp, '%', (index + 1), strlen(temp));
     }
     
     snprintf(dest, strlen(temp), "%s", temp);
@@ -508,9 +523,7 @@ static inline void fprintcmp(FILE* file, const char* str)
     
     fprintf(file, temp);
     free(temp);
-}
-
-// NEW ADDITIONS
+}*/
 
 bool strRMChar(char* dest, const char* src, const char c, const size_t dest_size, const size_t src_len)
 {
@@ -531,6 +544,59 @@ bool strRMChar(char* dest, const char* src, const char c, const size_t dest_size
     return true;
 }
 
+#define form(num) str_num
+
+void strForm(char* dest, const char* src, const char align, const uint_8 strings, const size_t dest_size, const size_t lengths[])
+{
+	size_t length = 0, largest = 0;
+	int_32* index_arr = (size_t*) alloca(sizeof(size_t) * strings), index = 0, prev_index = 0;
+	char* str_arr[strings];
+	
+	for(size_t i = 0; i < strings; i++) length += lengths[i];
+		
+	for(size_t i = 0; i < strings; i++)
+	{
+		str_arr[i] = (char*) malloc(sizeof(char) * lengths[i]);
+		memset(str_arr[i], '\0', (sizeof(char) * lengths[i]));
+		
+		substring(str_arr[i], src, index, (index + lengths[i]), (sizeof(char) * lengths[i]));
+		
+		index = indexOf(str_arr[i], align, lengths[i]);
+		
+		index_arr[i] = index;
+		index = (prev_index + lengths[i]);
+		prev_index = index;
+		
+		if(index_arr[i] > largest && index_arr[i] > 0) largest = index_arr[i];
+	}
+	
+	const size_t add_max = (sizeof(char) * largest);
+	
+	char* new_str = (char*) alloca(sizeof(char) * (length + (largest * strings))), *add_str = (char*) alloca(add_max);
+	
+	memset(add_str, '\0', add_max);
+	
+	size_t add = 0;
+	
+	for(size_t i = 0; i < strings; i++)
+	{
+		if(index_arr[i] <= largest) add = (largest - ((size_t) index_arr[i]));
+		else add = 0;
+		
+		memset(add_str, ' ', add);
+		
+		if(i == 0) snprintf(new_str, ((add_max + lengths[i]) + 1), "%s%s\n", add_str, str_arr[i]);
+		else snprintf(new_str, ((add_max + strlen(new_str) + lengths[i]) + 1), "%s%s%s\n", new_str, add_str, str_arr[i]);
+		
+		free(str_arr[i]);
+		
+		memset(add_str, '\0', add_max);
+	}
+	
+	snprintf(dest, dest_size, "%s", new_str);
+	
+	//free(new_str);
+}
 
 #ifdef __cplusplus 
 }

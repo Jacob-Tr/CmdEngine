@@ -1,11 +1,15 @@
 #ifndef FILE_H
 #define FILE_H
 
+#define MAX_FILE_PATH 32
+
 typedef enum
 {
    FILE_DATA,
    FILE_TYPES
 } ftype;
+
+#define NULL_FILE_PTR ((file*) NULL)
 
 typedef struct
 {
@@ -16,8 +20,6 @@ typedef struct
     bool open;
     size_t length;
 } file;
-#define invalid_file (file*) NULL
-uint_32 files = 0;
 
 char* file_ext[FILE_TYPES] =
 {
@@ -26,7 +28,7 @@ char* file_ext[FILE_TYPES] =
 
 #define MAX_DIS_CHARS 9 
 
-char disallowed_chars[] = {':', '*',     '?', '"', '<', '>', '|'}; 
+char disallowed_chars[] = {':', '*', '?', '"', '<', '>', '|'}; 
 
 #ifdef __WIN32
 
@@ -68,17 +70,17 @@ extern "C"
 
 bool strContainsChar(const char* str,const char ch, const size_t length);
 
-bool doesStrContainDisallowedChars(const char* string) 
+bool doesStrContainDisallowedChars(const char* string, const size_t length) 
 {     
     for(size_t i = 0; i <= MAX_DIS_CHARS; i++) if(strContainsChar(string, disallowed_chars[i], strlen(string))) return true;
     
     return false; 
 } 
 
-bool isValidWinFileName(const char* string) 
+bool isValidWinFileName(const char* string, const size_t length) 
 {
 #ifdef _WIN32
-    if(doesStrContainDisallowedChars(string)) return false;
+    if(doesStrContainDisallowedChars(string, length)) return false;
     
     for(size_t i = 0; i < MAX_DIS_NAMES; i++)
     {
@@ -89,30 +91,26 @@ bool isValidWinFileName(const char* string)
     return true; 
 } 
 
-bool isValidWinDir(const char* string)
+bool isValidWinDir(const char* string, const size_t length)
 {
     if(strlen(string) < 3) return false;
 
     char* disk = (char*) malloc(3 * sizeof(char));
     
-    snprintf(disk, 3, "%s", string);
+    substring(disk, string, 0, 3, 3);
     
-    if((*disk > 'Z' || *disk < 'A') || *(disk + 1) != ':' || *(disk + 2) != '/') 
-    {
-        free(disk);
-        return false;
-    }
+    bool ret = ((*disk > 'Z' || *disk < 'A') || *(disk + 1) != ':' || *(disk + 2) != '/');
     
     free(disk);
-    return true;
+    return !ret;
 }
 
-bool isValidDirectory(const char* string) 
+bool isValidDirectory(const char* string, const size_t length) 
 { 
-    if(doesStrContainDisallowedChars(string)) return false; 
+    if(doesStrContainDisallowedChars(string, length)) return false; 
     
 #ifdef _WIN32
-    return isValidWinDir(string);
+    return isValidWinDir(string, length);
 #endif
 
     return true; 
@@ -121,56 +119,56 @@ bool isValidDirectory(const char* string)
 bool isValidFileName(const char* string, const size_t length)
 {
 #ifdef _WIN32
-    if(!isValidWinFileName(string)) return false;
+    if(!isValidWinFileName(string, length)) return false;
 #endif
 
-    if(doesStrContainDisallowedChars(string)) return false;
+    if(doesStrContainDisallowedChars(string, length)) return false;
     
     if(strContainsChar(string, '/', length) || strContainsChar(string, '\\', length)) return false;
     
     return true;
 }
 
-bool isValidFileType(const ftype type) {return (type < 0 || type > FILE_TYPES);}
+bool isValidFileType(const ftype type) {return (type >= 0 && type < FILE_TYPES);}
 
 char* getFileTypeExtension(const ftype type) {
     if(!isValidFileType(type)) return "";
     return file_ext[type];
 }
 
-#define File(name, path, type, name_len, path_len) initFile((name), (path), (type), (name_len), (path_len))
-file* initFile(const char* path, const char* name, const ftype type, const size_t path_len, const size_t name_len)
+#define File(name, path, type) initFile((name), (path), (type), strlen((name)), strlen((path)))
+file* initFile(const char* name, const char* path, const ftype type, const size_t name_len, const size_t path_len)
 {
-    if(path_len == 0 || name_len == 0)
+    if(name_len == 0 || (((path_len + name_len) + 1) > MAX_FILE_PATH))
     {
         fprintf(stderr, "Error: initFile could initialize file with path length %zu and file name length %zu.\n", path_len, name_len);
         
-        return invalid_file;
+        return NULL_FILE_PTR;
     }
     
     if(!isValidFileType(type))
     {
         fprintf(stderr, "Error: initFile could initialize file with invalid file type %d.\n", (uint_32) type);
         
-        return invalid_file;
+        return NULL_FILE_PTR;
     }
     
-    if(!isValidDirectory(path))
+    if(!isValidDirectory(path, path_len) && path_len != 0)
     {
         fprintf(stderr, "Error: initFile could initialize file with invalid path \"%s\".\n", path);
         
-        return invalid_file;
+        return NULL_FILE_PTR;
     }
     
-    if(!isValidFileName(name, strlen(name)))
+    if(!isValidFileName(name, name_len))
     {
         fprintf(stderr, "Error: initFile could initialize file with invalid file name \"%s\".\n", name);
         
-        return invalid_file;
+        return NULL_FILE_PTR;
     }
     
     char* xtnsn = getFileTypeExtension(type);
-    const size_t length = ((path_len + name_len + strlen(xtnsn)) + 1);
+    const size_t length = ((path_len + name_len + (strlen(xtnsn) + 1)) + 1);
     char* f_name = (char*) malloc(length * sizeof(char));
     
     snprintf(f_name, length, "%s/%s%s", path, name, xtnsn);
@@ -184,7 +182,7 @@ file* initFile(const char* path, const char* name, const ftype type, const size_
         
         free(f);
         free(f_name);
-        return invalid_file;
+        return NULL_FILE_PTR;
     }
     
     file* file_strct = (file*) malloc(sizeof(file));
@@ -199,8 +197,6 @@ file* initFile(const char* path, const char* name, const ftype type, const size_
     fseek(file_strct->file, 0, SEEK_SET);
     fclose(f);
     
-    files++;
-    
     return file_strct;
 }
 
@@ -214,7 +210,7 @@ ftype getFileType(const file f) {return f.type;}
 
 bool FOpen(file* f, const char* mode) 
 {
-    if(f == invalid_file)
+    if(f == NULL_FILE_PTR)
     {
         fprintf(stderr, "Error: FOpen called on invalid file.\n");
         return false;
@@ -242,7 +238,7 @@ bool FOpen(file* f, const char* mode)
 
 bool FClose(file* f)
 {
-    if(f == invalid_file)
+    if(f == NULL_FILE_PTR)
     {
         fprintf(stderr, "Error: FClose called on invalid file.\n");
         return false;
@@ -262,7 +258,7 @@ bool FClose(file* f)
 
 size_t FGetSize(file* f)
 {
-    if(f == invalid_file)
+    if(f == NULL_FILE_PTR)
     {
         fprintf(stderr, "Error: FGetSize called on invalid file.\n");
         return 0;
@@ -271,8 +267,8 @@ size_t FGetSize(file* f)
     bool close = false;
     if(!isFileOpen(*f))
     {
-        if(FOpen(f, "R")) close = true;
-        else
+    	if(FOpen(f, "R")) close = true;
+    	else
         {
             fprintf(stderr, "Error: FGetSize called on closed file: \"%s\" which failed to open.\n", f->path);
         
@@ -291,7 +287,7 @@ size_t FGetSize(file* f)
 
 bool FRead(char* dest, const file* f, const size_t dest_size)
 {
-    if(f == invalid_file)
+    if(f == NULL_FILE_PTR)
     {
         fprintf(stderr, "Error: FRead called on invalid file.\n");
         return false;
@@ -311,7 +307,7 @@ bool FRead(char* dest, const file* f, const size_t dest_size)
 
 bool FWrite(file* f, const char* content, const size_t length)
 {
-    if(f == invalid_file)
+    if(f == NULL_FILE_PTR)
     {
         fprintf(stderr, "Error: FWrite called on invalid file.\n");
         return false;
@@ -323,30 +319,33 @@ bool FWrite(file* f, const char* content, const size_t length)
         return false;
     }
     
+    fseek(f->file, 0, SEEK_END);
+    
     f->length = fwrite(content, length, sizeof(char), f->file);
     fflush(f->file);
+    
+    fseek(f->file, 0, SEEK_SET);
     
     return true;
 }
 
-void FDestruct(file* f)
+void FDestruct(file** f)
 {
-    if(f == invalid_file)
+    if(*f == NULL_FILE_PTR)
     {
         fprintf(stderr, "Error: FDestruct called on invalid file.\n");
         return;
     }
     
-    if(isFileOpen(*f)) FClose(f);
+    if(isFileOpen(*(*f))) FClose(*f);
     
-    free(f->path);
+    free((*f)->path);
     
-    file* temp = f;
-    f = invalid_file;
+    file* temp = *f;
     
     free(temp);
     
-    files--;
+    *f = NULL_FILE_PTR;
 }
 
 #ifdef __cplusplus
