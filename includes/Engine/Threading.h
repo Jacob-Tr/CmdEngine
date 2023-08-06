@@ -3,109 +3,98 @@
 
 enum thread_enm
 {
-	THREAD_MAIN,
+	THREAD_NETWORK,
 	THREAD_INPUT,
+	THREAD_AUDIO,
 	THREAD_NULL
 };
 
-static bool exitThread[THREAD_NULL] = {false, false};
+static bool exitThread[THREAD_NULL] = {false, false, false};
+static size_t thread_id[THREAD_NULL] = {0, 0, 0};
 
-#include "includes/Engine/Threads/MainThread.h"
+#include "includes/Engine/Threads/NetworkThread.h"
 #include "includes/Engine/Threads/InputThread.h"
-
-threadQueue main_queue;
-thread_attr attr[THREAD_NULL];
+#include "includes/Engine/Threads/AudioThread.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-bool initMainThreadQueue(void)
+bool initUtilityThreads(void)
 {
-	newThreadQueue(&main_queue, THREAD_NULL);
+	THREAD* network_thread = getNextThreadFromPool(main_pool, &thread_id[THREAD_NETWORK]), *input_thread = getNextThreadFromPool(main_pool, &thread_id[THREAD_INPUT]), *audio_thread = getNextThreadFromPool(main_pool, &thread_id[THREAD_AUDIO]);
 
-	
-	THREAD* main_thread = getThreadPtrFromQueue(&main_queue, THREAD_MAIN), *input_thread = getThreadPtrFromQueue(&main_queue, THREAD_INPUT);
-
-	if((main_thread == NULL) || (input_thread == NULL))
+	if((network_thread == NULL) || (input_thread == NULL) || (audio_thread == NULL))
 	{
 		#ifdef DEBUG
-		    fprintf(stderr, "Error: Could not get thread pointer from thread queue.\n");
-		#endif
-		
-		return false;
-	}
-	
-	thread_attr* main_attr = &attr[THREAD_MAIN], *input_attr = &attr[THREAD_INPUT];
-	
-	if(!(initThread(main_thread, main_attr, ((start_func) (mainLoop)), NULL, 0)))
-	{
-		#ifdef DEBUG
-		    fprintf(stderr, "Error: Could not initialize main thread. (%p)\n", main_thread);
+		    fprintf(stderr, "Error: Could not get thread pointer from thread pool.\n");
 		#endif
 		
 		return false;
 	}
 
-	if(!(initThread(input_thread, input_attr, ((start_func) (inputLoop)), NULL, 0)))
-	{
-		#ifdef DEBUG
-		    fprintf(stderr, "Error: Could not initialize input thread. (%p)\n", input_thread);
-		#endif
-		
-		return false;
-	}
-	
-	if(!(addThreadToQueue(&main_queue, main_thread) && addThreadToQueue(&main_queue, input_thread)))
-	{
-		#ifdef DEBUG
-		    fprintf(stderr, "Error: Failed to add main and/or input thread to main thread queue.\n");
-		#endif
-		
-		return false;
-	}
+	char* names[THREAD_NULL];
+
+	for(size_t i = 0; i < THREAD_NULL; i++) names[i] = (char*) malloc(sizeof(char) * MAX_THREAD_NAME);
+
+	memcpy(names[THREAD_NETWORK], "Network Thread", strlen("Network Thread"));
+	memcpy(names[THREAD_INPUT], "Input Thread", strlen("Input Thread"));
+	memcpy(names[THREAD_AUDIO], "Audio Thread", strlen("Audio Thread"));
+
+	*(names[THREAD_NETWORK] + strlen("Network Thread")) = '\0';
+	*(names[THREAD_INPUT] + strlen("Input Thread")) = '\0';
+	*(names[THREAD_AUDIO] + strlen("Audio Thread")) = '\0';
+
+	initThread(network_thread, names[THREAD_NETWORK], strlen(names[THREAD_NETWORK]), (void*) networkLoop, NULL, 0);
+	initThread(input_thread, names[THREAD_INPUT], strlen(names[THREAD_INPUT]), (void*) inputLoop, NULL, 0);
+	initThread(audio_thread, names[THREAD_AUDIO], strlen(names[THREAD_AUDIO]), (void*) audioLoop, NULL, 0);
 	
 	return true;
 }
 
-void exitMainThread(void) {exitThread[THREAD_MAIN] = true;}
-
-void exitInputThread(void) {exitThread[THREAD_INPUT] = true;}
-
-void exitMainThreadQueue(void)
+void getUtilityThreadPtrs(THREAD** input, THREAD** audio, THREAD** network)
 {
-	exitInputThread();
-	exitMainThread();
+	*input = getThreadPtrFromPool(*main_pool, thread_id[THREAD_NETWORK]);
+	*network = getThreadPtrFromPool(*main_pool, thread_id[THREAD_INPUT]);
+	*audio = getThreadPtrFromPool(*main_pool, thread_id[THREAD_AUDIO]);
 }
 
-bool startMainThreadQueue(void)
+void exitUtilityThread(enum thread_enum t)
 {
-	if(!main_queue.init)
+	THREAD* thread = getThreadPtrFromPool(*main_pool, thread_id[t]);
+
+	exitThread[t] = true;
+
+	SDL_WaitThread(thread->thread, NULL);
+}
+
+void exitUtilityThreads(void)
+{
+	exitUtilityThread(THREAD_NETWORK);
+	exitUtilityThread(THREAD_INPUT);
+	exitUtilityThread(THREAD_AUDIO);
+}
+
+bool startUtilityThreads(void)
+{
+	THREAD* input, *network, *audio;
+
+	getUtilityThreadPtrs(&input, &audio, &network);
+
+	if(!(startThread(input) && startThread(audio) && startThread(network)))
 	{
 		#ifdef DEBUG
-		    fprintf(stderr, "Warning: Attempted to start main queue without initialization.\n");
-	    #endif
-	    
-	    return false;
-	}
-	
-	if(main_queue.started)
-	{
-		#ifdef DEBUG
-		    fprintf(stderr, "Warning: Attempted to start main queue multiple times.\n");
+			fprintf(stderr, "Error: One or more utility threads failed to start.\n");
 		#endif
-		
+
 		return false;
 	}
-	
-	startThreadsInQueue(&main_queue);
-    joinQueue(&main_queue);
     
     return true;
 }
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 }
 #endif
 

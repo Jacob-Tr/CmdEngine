@@ -44,10 +44,14 @@ void destroyPoint(point** pt)
 	
     destroyPixel(&(ptr->px));
 	
-	*pt = null_point;
+	*pt = ((point*) NULL);
 }
 
+// Set the pixel pointed to by the specified point.
+
 void setPointPixel(point* pt, const pixel px) {pt->px = px;}
+
+// Set/Get the coordinates which a point will appear with regard to the screen bounds.
 
 void setPointCoords(point* pt, const vector3 vect) {pt->vect = vect;}
 
@@ -56,6 +60,10 @@ vector3 getPointCoords(const point pt) {return pt.vect;}
 size_t getPointX(const point pt) {return getPointCoords(pt).x;}
 size_t getPointY(const point pt) {return getPointCoords(pt).y;}
 size_t getPointZ(const point pt) {return getPointCoords(pt).z;}
+
+void setPointX(point* pt, const size_t value) {pt->vect.x = value;}
+void setPointY(point* pt, const size_t value) {pt->vect.y = value;}
+void setPointZ(point* pt, const size_t value) {pt->vect.z = value;}
 
 #ifdef _cplusplus
 }

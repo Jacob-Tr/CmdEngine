@@ -3,11 +3,11 @@
 
 #define MAX_USR_INPUT 64
 
-static volatile char* __usr_in__ = NULL;
+static char* __usr_in__ = NULL;
 
-#define print(str) addChat((str), strlen((str)))
+#define print(str) addChat((str), strlen((str))) 
 
-#define printc(c) char* __str = (char*) malloc(sizeof(char)); snprintf(__str, 10, "Char: %c[%d]", (c), ((int_32) (c))); print((__str)); free((__str));
+#define printc(c) char* __str = (char*) malloc(sizeof(char)); snprintf(__str, 1, "Char: %c", (c), ((int_32) (c))); print((__str)); free((__str));
 #define CMD_DELIM '/'
 
 static char* chat_text;
@@ -15,10 +15,14 @@ static vector2 chat_size = empty_vector2;
 
 static bool chat_init = false;
 
+bool get_input = true;
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+void toggleInput(bool value) {get_input = value;}
 
 void initChatbox(const size_t x, const size_t z)
 {
@@ -157,9 +161,12 @@ bool processCmd(const char* str, size_t length)
 	//if(*(str + length) == '\0') length--;
 	CMD("/exit")
 	{
+		toggleInput(false);
 		print("Exiting...");
 		sleep(2);
-		exitMainThreadQueue();
+		exitGame();
+		
+		
 		return true;
 	}
 	

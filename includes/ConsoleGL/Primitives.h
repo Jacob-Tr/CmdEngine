@@ -1,6 +1,10 @@
 #ifndef PRIMITIVES_H
 #define PRIMITIVES_H
 
+/*
+	'Vector' types for logically grouped variables (with 'empty_[vect]' macros for ease of use.
+*/
+
 #define empty_vector2 {.x = 0, .z = 0}
 typedef struct {size_t x, z;} vector2;
 
@@ -25,15 +29,25 @@ typedef struct {int_64 x, y, z;} vector3l;
 #define empty_vector3f {.x = 0.0F, .y = 0.0F, .z = 0.0F}
 typedef struct {float x, y, z;} vector3f;
 
+/*
+	Vector area structures and empty macros for ease of use..
+*/
+#define empty_v2area {.a = empty_vector2, .b = empty_vector2}
+typedef struct {vector2 a, b;} v2_area;
+
 #define empty_v3area {.a = empty_vector3, .b = empty_vector3}
 typedef struct {vector3 a, b;} v3_area;
 
-#define null_pixel ((pixel*) NULL)
-#define empty_pixel {.c = ' '}
-typedef struct {char c;} pixel;
+/*
+	Basic pixel color container with 'BLANK' macro for ease of use.
+*/
 
+#define BLANK_PIXEL GPU_MakeColor(0, 0, 0, 255)
+typedef struct {SDL_Color c;} pixel;
+
+// Utilities for working with Vectors.
 #include "Includes/ConsoleGL/Primitives/VectorUtils.h"
+// Utilities for working in regard to the bounds created by a collection of Vectors.
 #include "Includes/ConsoleGL/Primitives/AreaUtils.h"
-#include "Includes/ConsoleGL/Primitives/PixelUtils.h"
 
 #endif

@@ -6,9 +6,9 @@
 #include "includes/Utils/Debug/MemoryDebug.h"
 
 #ifdef __NO_SCREEN_PRINT__
-    static volatile bool __print_screen__ = false;
+    static bool __print_screen__ = false;
 #else
-    static volatile bool __print_screen__ = true;
+    static bool __print_screen__ = true;
 #endif
 
 #ifdef _cplusplus

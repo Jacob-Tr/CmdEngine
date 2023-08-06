@@ -556,7 +556,7 @@ void strForm(char* dest, const char* src, const char align, const uint_8 strings
 		
 	for(size_t i = 0; i < strings; i++)
 	{
-		str_arr[i] = (char*) malloc(sizeof(char) * lengths[i]);
+		*(str_arr + i) = (char*) malloc((sizeof(char) * lengths[i]) + strings);
 		memset(str_arr[i], '\0', (sizeof(char) * lengths[i]));
 		
 		substring(str_arr[i], src, index, (index + lengths[i]), (sizeof(char) * lengths[i]));

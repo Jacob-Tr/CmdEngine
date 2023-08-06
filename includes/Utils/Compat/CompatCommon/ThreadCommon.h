@@ -1,152 +1,74 @@
 #ifndef THREAD_COMMON_H
 #define THREAD_COMMON_H
 
-#define EMPTY_THREAD ((THREAD) {.init = false, .started = false, .id = 0, .stack_size = 0, .param_count = 0})
-typedef struct
-{
-	bool init, started;
-	thread_id id;
-	HANDLE handle;
-	thread_attr attr;
-	size_t stack_size, param_count;
-	start_func func_ptr;
-	start_func_params func_param_buf;
-} THREAD;
+#define MAX_THREAD_NAME ((size_t) 64)
 
-#define EMPTY_THREADQUEUE ((threadQueue) {.init = false, .started = false, .size = 0, .entries = 0, .threads = ((THREAD*) NULL)})
+#define empty_thread ((THREAD) {.init = false, .started = false, .is_pooled = false, .is_pooled_thread_assigned = false, .pool_id = SIZE_MAX, .pool_element = SIZE_MAX, .thread = ((SDL_Thread*) NULL), .id = 0, .stack_size = 0, .param_count = 0})
 typedef struct
 {
-	bool init, started;
-	size_t size, entries;
-	THREAD* threads;
-} threadQueue;
+	bool init, started, is_pooled, is_pooled_thread_assigned;
+	size_t pool_id, pool_element;
+	SDL_Thread* thread;
+	SDL_threadID id;
+	char* thread_name;
+	size_t stack_size, param_count, thread_name_len;
+	void* func_ptr;
+	void* func_param_buf;
+} THREAD;
 
 #ifdef _cplusplus
 extern "C"
 {
 #endif
 
-bool queueInitCheck(threadQueue* queue)
+void destroyThread(THREAD* thread)
 {
-	if(queue->init) return true;
-	
-	THREAD* ptr = ((THREAD*) NULL);
-	
-	for(size_t i = 0; i < queue->entries; i++)
-	{
-		ptr = ((queue->threads) + i);
-		if(!ptr->init) return false;
-	}
-	
-	queue->init = true;
+	if(thread->thread_name != ((char*) NULL)) free(thread->thread_name);
+	thread->thread_name_len = 0;
 
-	return true;
+	bool is_pooled = thread->is_pooled;
+	size_t id = SIZE_MAX, element = SIZE_MAX;
+	if(is_pooled)
+	{
+		id = thread->pool_id;
+		element = thread->pool_element;
+	}
+
+	*thread = empty_thread;
+
+	thread->is_pooled = is_pooled;
+	thread->pool_id = id;
+	thread->pool_element = element;
 }
 
-void newThreadQueue(threadQueue* queue, const size_t queue_size)
-{
-	*queue = EMPTY_THREADQUEUE;
-	
-	queue->size = queue_size;
-	queue->threads = (THREAD*) malloc(sizeof(THREAD) * queue->size);
-
-	for(size_t i = 0; i < queue->size; i++) *(queue->threads + i) = EMPTY_THREAD;
-
-	queue->init = true;
-}
-
-void destroyThreadQueue(threadQueue* queue)
-{
-	for(size_t i = 0; i < queue->entries; i++) THREAD_ATTR_DESTROY(&((queue->threads + i)->attr));
-	free(queue->threads);
-}
-
-THREAD* getThreadPtrFromQueue(threadQueue* queue, const size_t index)
-{
-	if(index >= queue->size)
-	{
-		#ifdef DEBUG
-		    fprintf(stderr, "Warning: Could not get thread pointer at index #%zu in queue with %zu elements.\n", index, queue->size);
-		#endif
-		
-		return ((THREAD*) NULL);
-	}
-	
-	return ((queue->threads) + index);
-}
-
-bool isPtrToQueuedThread(threadQueue* queue, THREAD* thread)
-{
-	for(size_t i = 0; i < queue->entries; i++) if(getThreadPtrFromQueue(queue, i) == thread) return true;
-
-    return false;
-}
-
-bool addThreadToQueue(threadQueue* queue, THREAD* thread)
-{
-	if(queue->started)
-	{
-		#ifdef DEBUG
-		    fprintf(stderr, "Warning: Could not add thread #%zu to queue - Threads in this queue have already been started.\n", ((size_t) thread->id));
-		#endif
-		
-		return false;
-	}
-	
-	if(!queue->init)
-	{
-		#ifdef DEBUG
-		    fprintf(stderr, "Warning: Could not add thread #%zu to queue - Thread queue not initialized.\n", ((size_t) thread->id));
-		#endif
-		
-		return false;
-	}
-	
-	if(queue->entries >= queue->size)
-	{
-		#ifdef DEBUG
-		    fprintf(stderr, "Warning: Could not add thread #%zu to queue of size %zu.\n", ((size_t) thread->id), queue->size);
-		#endif
-		
-		return false;
-	}
-	
-	thread->id = ((thread_id) queue->entries);
-	
-	if(isPtrToQueuedThread(queue, thread))
-	{
-		queue->entries++;
-		return true;
-	}
-	
-	*(queue->threads + queue->entries++) = *thread;
-	
-	return true;
-}
-
-bool initThread(THREAD* thread, thread_attr* attr, start_func func, start_func_params params, const size_t param_count) 
+bool initThread(THREAD* thread, const char* name, size_t name_len, void* func, void* params, const size_t param_count) 
 {
 	if(thread->init)
 	{
 		#ifdef DEBUG
-		    fprintf(stderr, "Warning: Reinitialization of thread #%zu.\n", ((size_t) thread->id));
+		    fprintf(stderr, "Warning: Reinitialization of thread \"%s\" [#%lu].\n", thread->thread_name, thread->id);
 		#endif
 		    
         return false;
 	}
-	
-	*thread = EMPTY_THREAD;
-	
-	if(THREAD_ATTR_INIT(attr))
+
+	if(strlen(name) >= MAX_THREAD_NAME)
 	{
 		#ifdef DEBUG
-		    fprintf(stderr, "Warning: Failed to initialize thread attributes\n");
+			fprintf(stderr, "Warning: Thread name \"%s\" is too long. [Max: %zu characters]\n", name, MAX_THREAD_NAME);
 		#endif
-		
+
 		return false;
 	}
-	thread->attr = *attr;
 	
+	*thread = empty_thread;
+
+	thread->thread_name = (char*) malloc(sizeof(char) * (name_len + 1));
+	
+	thread->thread_name_len = name_len;
+	memcpy(thread->thread_name, name, name_len);
+	*(thread->thread_name + name_len) = '\0';
+
 	thread->func_ptr = func;
 	thread->func_param_buf = params;
 	thread->param_count = param_count;
@@ -156,76 +78,47 @@ bool initThread(THREAD* thread, thread_attr* attr, start_func func, start_func_p
 	return true;
 }
 
-void joinQueue(threadQueue* queue)
-{
-	if(!queue->started)
-	{
-		#ifdef DEBUG
-		    fprintf(stderr, "Warning: Could not join threads in queue - Threads not started.\n");
-		#endif
-		
-		return;
-	}
-	
-	HANDLE* handles = (HANDLE*) malloc(sizeof(HANDLE) * queue->entries);
-	
-	for(size_t i = 0; i < queue->entries; i++) *(handles + i) = ((queue->threads + i)->handle);
-	
-	WaitForMultipleObjects(((uint_32) queue->entries), handles, true, INFINITE);
-	
-	free(handles);
-}
-
-void startThread(THREAD* thread)
+bool startThread(THREAD* thread)
 {
 	if(!thread->init)
 	{
 		#ifdef DEBUG
-		    fprintf(stderr, "Warning: Could not start thread #%zu. - Thread is not initialized.\n", ((size_t) thread->id));
+		    fprintf(stderr, "Warning: Could not start thread \"%s\"[#%zu]. - Thread is not initialized.\n", thread->thread_name, ((size_t) thread->id));
 		#endif
 		
-		return;
+		return false;
 	}
 	
 	if(thread->started)
 	{
 		#ifdef DEBUG
-		    fprintf(stderr, "Warning: Could not start thread #%zu. - Thread is already running.\n", ((size_t) thread->id));
+		    fprintf(stderr, "Warning: Could not start thread \"%s\"[#%zu]. - Thread is already running.\n", thread->thread_name, ((size_t) thread->id));
 		#endif
 		
-		return;
+		return false;
 	}
-	
-	if(!THREAD_CREATE(&thread->handle, &thread->id, thread->stack_size, &thread->attr, thread->func_ptr, thread->func_param_buf, 0))
+
+	thread->thread = SDL_CreateThread(thread->func_ptr, thread->thread_name, thread->func_param_buf);
+
+	if(thread->thread == NULL)
 	{
-	    #ifdef DEBUG
-	        fprintf(stderr, "Warning:Failed to start thread #%zu.\n", ((size_t) thread->id));
-	    #endif
-	    
-	    return;
+		#ifdef DEBUG
+			fprintf(stderr, "Warning: Could not start thread \"%s\"[#%zu].\n", thread->thread_name, ((size_t) thread->id));
+		#endif
+
+		return false;
 	}
 	
 	thread->started = true;
+
+	return true;
 }
 
-void startThreadsInQueue(threadQueue* queue)
-{
-	if(!queueInitCheck(queue))
-	{
-		#ifdef DEBUG
-		    fprintf(stderr, "Warning: Could not start threads in queue. - Not all threads are initialized.\n");
-		#endif
-
-		return;
-	}
-	
-	for(size_t i = 0; i < queue->entries; i++) startThread(queue->threads + i);
-	
-	queue->started = true;
-}
-
-#ifdef _cplusplus
+#ifdef __cplusplus
 }
 #endif
+
+#include "includes/Utils/Compat/CompatCommon/ThreadUtils/ThreadPool.h"
+//#include "includes/Utils/Compat/CompatCommon/ThreadUtils/ThreadQueue.h"
 
 #endif

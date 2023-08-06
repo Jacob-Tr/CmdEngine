@@ -83,6 +83,8 @@ bool getPrintAlloc(const alloc_type type)
 		case CALLOC: return __print_calloc__;
 		case MALLOC: return __print_malloc__;
 	}
+
+	return false;
 }
 
 void setPrintAllAllocs(const bool value)
@@ -100,17 +102,20 @@ void allocTypeToText(char* dest, const alloc_type type)
 	{
 		case MALLOC:
 		{
-			snprintf(dest, 10, "Malloc");
+			memcpy(dest, "Malloc", 7);
+			*(dest + 6) = '\0';
 			return;
 		}
 		case CALLOC:
 		{
-			snprintf(dest, 10, "Calloc");
+			memcpy(dest, "Calloc", 7);
+			*(dest + 6) = '\0';
 			return;
 		}
 		case ALLOCA:
 		{
-			snprintf(dest, 10, "Alloc");
+			memcpy(dest, "Alloc", 6);
+			*(dest + 5) = '\0';
 			return;
 		}
 		default: snprintf(dest, 10, "Null");
@@ -260,6 +265,8 @@ void removeAllPtrNames(void)
 
 void removePtrFromTrckrByIndex(const size_t index, const alloc_type type)
 {
+	if((ptrs[type] + index)->addr == NULL) return;
+
 	ptr_trckr trckr = *(ptrs[type] + index);
 	
 	size_t prev_bytes = bytes[type];
@@ -267,7 +274,7 @@ void removePtrFromTrckrByIndex(const size_t index, const alloc_type type)
 	bytes[type] -= trckr.bytes;
     
     if(bytes[type] > prev_bytes) fprintf(stderr, "Warning: Registering %zu bytes for allocation type %d.\n", bytes[type], ((int_32) type));
-    
+
     removePtrNameByTracker((ptrs[type] + index));
 	
 	*(ptrs[type] + index) = ((ptr_trckr) {NULL, 0});
@@ -278,7 +285,7 @@ void removePtrFromTrckr(void* ptr)
 	alloc_type type = NULL_ALLOC;
 	size_t index = findPtrIndex(ptr, &type);
 	
-	if(type == NULL_ALLOC || index == SIZE_MAX)
+	if(type >= NULL_ALLOC || index >= SIZE_MAX)
 	{
 		fprintf(stderr, "Warning: %p was not found in tracked address list.\n", ptr);
 		
@@ -309,7 +316,6 @@ void finalizeMemory(void)
 				total_leaked_bytes += leaked_bytes;
 				
 				fprintf(stderr, "Warning: Memory leak detected - %zu bytes at address: %p.\n", leaked_bytes, ptr);
-				
 			    debugFree((ptrs[i] + ii)->addr);
 			}
 		}
@@ -390,6 +396,8 @@ void debugFree(void* ptr)
 	}
 	
 	removePtrFromTrckrByIndex(index, type);
+
+	return;
 	
 	free(ptr);
 }

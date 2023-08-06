@@ -36,6 +36,13 @@ static const char* disp_setting_ident[] =
 	"Fps"
 };
 
+
+#define empty_screen_obj {BLANK_PIXEL, BLANK_PIXEL, BLANK_PIXEL}
+typedef struct
+{
+	pixel x, y, z;
+} screen_obj;
+
 static size_t screen_x = 0, screen_y = 0, fr_pr_sec = 15;
 
 #ifdef _cplusplus
