@@ -3,7 +3,7 @@
 
 void debugFree(void* ptr);
 
-void strForm(char* dest, const char* src, const char align, const uint_8 strings, const size_t dest_size, const size_t lengths[]);
+void strForm(char* dest, const char* src, const char align, const uint8_t strings, const size_t dest_size, const size_t lengths[]);
 
 #ifdef _MSC_VER
 	#define alloca _alloca
@@ -273,7 +273,7 @@ void removePtrFromTrckrByIndex(const size_t index, const alloc_type type)
 	
 	bytes[type] -= trckr.bytes;
     
-    if(bytes[type] > prev_bytes) fprintf(stderr, "Warning: Registering %zu bytes for allocation type %d.\n", bytes[type], ((int_32) type));
+    if(bytes[type] > prev_bytes) fprintf(stderr, "Warning: Registering %zu bytes for allocation type %d.\n", bytes[type], ((int32_t) type));
 
     removePtrNameByTracker((ptrs[type] + index));
 	

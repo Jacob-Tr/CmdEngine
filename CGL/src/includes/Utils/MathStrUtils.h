@@ -1,14 +1,16 @@
 #ifndef MATH_STR_UTILS_H
 #define MATH_STR_UTILS_H
 
+// Just don't worry about it
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-bool ismathconstant(const char c) {return ((bool) isnumber(c)/* || (c == 'π')*/);}
+bool ismathconstant(const char c) {return ((bool) isnumber(c));}
 
-bool isbaseoperator(const char c) {return ((bool) (c == '/') ||  (c == '*')/* || (c == '÷') || (c == '×') || (c == '•')*/ || (c == '+') || (c == '-'));}
+bool isbaseoperator(const char c) {return ((bool) (c == '/') ||  (c == '*') || (c == '+') || (c == '-'));}
 
 bool isadvancedoperator(const char c) {return ((bool) (c == '^') || (c == '!') || (c == '%'));}
 
@@ -60,7 +62,7 @@ bool isnumericoperator(const char* str, const size_t index, const size_t length)
 bool isvalidexpsn(const char* str, const size_t length)
 {
 	bool valid = false;
-	int_16 brackets = 0;
+	int16_t brackets = 0;
 	char c = '\0', former = '\0', latter = '\0';
 	
 	for(size_t i = 0; i < length; i++)

@@ -7,19 +7,16 @@
 */
 void exitMainThreadQueue(void);
 
-// Declare ConsoleGL data structures and allocate memory blocks.
-#include "includes/ConsoleGL.h"
-
 /*
 	General output modules for ConsoleGL application engine.
 */
 // Sound effects and audio support.
-#include "includes/Engine/Audio.h"
+#include "Engine/Audio.h"
 // Physics and mapping logic; sprite, model and meshes.
-#include "includes/Engine/World.h"
-// Screen detail logic; text, options and menus.
-#include "includes/Engine/Interface.h"
+#include "Engine/World.h"
+// Data structures for visual output information.
+#include "Engine/Visuals.h"
 // Threading logic.
-#include "includes/Engine/Threading.h"
+#include "Engine/Threading.h"
 
 #endif

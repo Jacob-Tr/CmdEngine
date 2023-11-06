@@ -1,22 +1,27 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "includes/Engine/Windowing/WinEvents.h"
+#include "includes/Game/Interface/Windowing/WinEvents.h"
 
-static GPU_Target* main_target;
-static SDL_Window* main_window;
+uint32_t window_flags = 0;
+GPU_InitFlagEnum gpu_flags = 0;
 
-struct GPU_Target a;
+static GPUWindow* main_window;
+static size_t active_gpu_windows = 0;
+
+// SDL provided macro in the form of a vector2.
+#define DEFAULT_WINPOS ((vector2) {SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED})
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-uint32_t window_flags = 0;
-GPU_InitFlagEnum gpu_flags = 0;
+GPUWindow* __cdecl getMainWindowPtr() {return main_window;}
+void __cdecl setMainWindowPtr(GPUWindow* window) {main_window = window;}
 
-bool winInit(void)
+// Initialize SDL video data for use with windowing.
+bool __stdcall winInit(void)
 {
 	int32_t error = 0;
 
@@ -25,7 +30,7 @@ bool winInit(void)
 	if(error)
 	{
 		#ifdef DEBUG
-			fprintf(stderr, "Warning: Failed to initialize SDL. \"%s\"", SDL_GetError());
+			fprintf(stderr, "Error: Failed to initialize SDL. \"%s\"", SDL_GetError());
 		#endif
 
 		return false;
@@ -37,36 +42,74 @@ bool winInit(void)
 	return true;
 }
 
-bool winCreate(SDL_Window* win, GPU_Target* target)
+#define winCreateDefaultPos(win, area) winCreate((win), (area), DEFAULT_WINPOS)
+bool __stdcall winCreate(SDL_Window** win, const vector2 area, const vector2 pos)
 {
-	win = SDL_CreateWindow("My Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, window_flags);
+	*win = SDL_CreateWindow("My Window", (int32_t) pos.x, (int32_t) pos.z, (int32_t) area.x, (int32_t) area.z, window_flags);
 	
-	if(win == NULL)
+	if(*win == NULL)
 	{
 		#ifdef DEBUG
-			fprintf(stderr, "Warning: Creation of window failed. \"%s\".\n", SDL_GetError());
+			fprintf(stderr, "Error: Creation of window failed. \"%s\".\n", SDL_GetError());
 		#endif
 
 		return false;
 	}
 
-	SDL_GetWindowSize(win, &screen_size_x, &screen_size_y);
+	SDL_GetWindowSize(*win, (int32_t*) &screen_bounds.x, (int32_t*) &screen_bounds.z);
 
-	GPU_SetInitWindow(SDL_GetWindowID(win));
-	GPU_InitRenderer(GPU_RENDERER_OPENGL_3, screen_size_x, screen_size_y, GPU_DEFAULT_INIT_FLAGS);
+	GPU_SetInitWindow(SDL_GetWindowID(*win));
+	GPU_InitRenderer(GPU_RENDERER_OPENGL_3, (uint16_t) screen_bounds.x, (uint16_t) screen_bounds.z, GPU_DEFAULT_INIT_FLAGS);
 
-	target = GPU_LoadTarget(win);
+	return true;
+}
 
-	if(target == NULL)
+bool __cdecl applyGPUTargetToWindow(SDL_Window* win, GPU_Target** target)
+{
+	*target = GPU_CreateTargetFromWindow(SDL_GetWindowID(win));
+
+	if(*target == NULL)
 	{
 		#ifdef DEBUG
-			fprintf(stderr, "Warning: Creation of GPU_Target failed. \"%s\"\n", SDL_GetError());
+			fprintf(stderr, "Error: Creation of GPU_Target failed. \"%s\"\n", SDL_GetError());
 		#endif
-
-		SDL_DestroyWindow(win);
 
 		return false;
 	}
+
+	return true;
+}
+
+void __stdcall destroyGPUWindow(GPUWindow* window)
+{
+	if(window == ((GPUWindow*) NULL)) return;
+
+	SDL_DestroyWindow(window->window);
+	GPU_FreeTarget(window->target);
+
+	window->id = SIZE_MAX;
+}
+
+bool __cdecl createGPUWindow(GPUWindow** window) 
+{
+	*window = (GPUWindow*) malloc(sizeof(GPUWindow));
+
+	(*window)->id = ++active_gpu_windows;
+
+	if(!winCreateDefaultPos(&((*window)->window), (vector2) Vect2(640, 480)) || !applyGPUTargetToWindow((*window)->window, &(*window)->target))
+	{
+		#ifdef DEBUG
+			fprintf(stderr, "Error: createGPUWindow failed to create window #%zu.\n", (*window)->id);
+			printSDLError(stderr);
+		#endif
+
+		destroyGPUWindow(*window);
+
+		return false;
+	}
+
+	(*window)->id = ((size_t) SDL_GetWindowID((*window)->window));
+	(*window)->updated = true;
 
 	return true;
 }

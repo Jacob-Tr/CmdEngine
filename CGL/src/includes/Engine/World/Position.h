@@ -8,8 +8,7 @@ typedef enum
 	Z
 } AXIS;
 
-#define empty_position {0, empty_vector2f, empty_vector2f}
-
+#define empty_position {0, (vector3f) Vect3(0.0, 0.0, 0.0), (vector3f) Vect3(0.0, 0.0, 0.0)}
 typedef struct
 {
 	world w;
@@ -131,7 +130,7 @@ void updatePosWorld(position* pos, const world w) {pos->w = w;}
 
 void initPosition(position* pos)
 {
-	vector3f coords = empty_vector3f, rot = empty_vector3f;
+	vector3f coords = (vector3f) Vect3(0.0, 0.0, 0.0), rot = (vector3f) Vect3(0.0, 0.0, 0.0);
 	
 	updatePosWorld(pos, 0);
 	updatePos(pos, coords);

@@ -10,6 +10,15 @@ bool isnumber(const char c) {return (c >= '0' && c <= '9');}
 
 bool isnumeric(const char* str, const size_t length)
 {
+    if(str == ((char*) NULL))
+    {
+        #ifdef DEBUG
+            fprintf(stderr, "Error: NULL passed to isnumberic. Good luck.\n");
+        #endif
+
+        return false;
+    }
+
     for(size_t i = 0; i < length; i++) if(!isnumber(*(str + i))) return false;
     return true;
 }
@@ -20,12 +29,30 @@ bool ispunctuation(const char c) {return (c == '.' || c == '\'' || c == '"' || c
 
 bool isalphastr(const char* str, const size_t length) 
 {
+    if(str == ((char*) NULL))
+    {
+        #ifdef DEBUG
+            fprintf(stderr, "Error: NULL passed to isalphastr.\n");
+        #endif
+
+        return false;
+    }
+
 	for(size_t i = 0; i < length; i++) if(!isalphachar(*(str + i))) return false;
 	return true;
 }
 
 bool isalphanumeric(const char* str, const size_t length) 
 {
+    if(str == ((char*) NULL))
+    {
+        #ifdef DEBUG
+            fprintf(stderr, "Error: NULL passed to isalphanumeric.\n");
+        #endif
+
+        return false;
+    }
+
 	char c = '\0';
 	for(size_t i = 0; i < length; i++)
 	{
@@ -44,6 +71,24 @@ bool isalphanumeric(const char* str, const size_t length)
 
 bool substring(char* dest, const char* src, const size_t begin, const size_t end, const size_t dest_size)
 {
+    if(src == ((char*) NULL))
+    {
+        #ifdef DEBUG
+            fprintf(stderr, "Error: NULL passed to substring as src.\n");
+        #endif
+
+        return false;
+    }
+
+    if(dest == ((char*) NULL))
+    {
+        #ifdef DEBUG
+            fprintf(stderr, "Error: NULL passed to substring as dest.\n");
+        #endif
+
+        return false;
+    }
+
     size_t end_override = end;
     if(end > strlen(src))
     {
@@ -57,7 +102,7 @@ bool substring(char* dest, const char* src, const size_t begin, const size_t end
     if(begin >= end_override)
     {
     	#ifdef DEBUG
-            fprintf(stderr, "Warning: substring could not derive string %zu to %zu in string \"%s\".\n", begin, end_override, src);
+            fprintf(stderr, "Error: substring could not derive string %zu to %zu in string \"%s\".\n", begin, end_override, src);
         #endif
         
         
@@ -79,38 +124,65 @@ bool substring(char* dest, const char* src, const size_t begin, const size_t end
     return true;
 }
 
-int_32 indexOf(const char* string, const char c, const size_t length)
+int32_t indexOf(const char* str, const char c, const size_t length)
 {
+    if(str == ((char*) NULL))
+    {
+        #ifdef DEBUG
+            fprintf(stderr, "Error: NULL passed to indexOf.\n");
+        #endif
+
+        return false;
+    }
+
     for(size_t i = 0; i < length; i++)
     {
         if(i > INT_MAX)
         {
-            fprintf(stderr, "Error: indexOf overflow searching for \'%c\' in \"%s\".", c, string);
+            fprintf(stderr, "Error: indexOf overflow searching for \'%c\' in \"%s\".", c, str);
             return -1;
         }
         
-        if(*(string + i) == c) return ((int_32) i);
+        if(*(str + i) == c) return ((int32_t) i);
     }
     
     return -1;
 }
 
-int_32 lastIndexOf(const char* string, const char c, const size_t length)
+int32_t lastIndexOf(const char* str, const char c, const size_t length)
 {
+    if(str == ((char*) NULL))
+    {
+        #ifdef DEBUG
+            fprintf(stderr, "Error: NULL passed to lastIndexOf.\n");
+        #endif
+
+        return false;
+    }
+
     if(length > INT_MAX)
     {
-        fprintf(stderr, "Error: lastIndexOf overflow searching for \'%c\' in \"%s\".", c, string);
+        fprintf(stderr, "Error: lastIndexOf overflow searching for \'%c\' in \"%s\".", c, str);
         
         return -1;
     }
     
-    for(size_t i = (length - 1); i < length; i--) if(*(string + i) == c) return ((int_32) i);
+    for(size_t i = (length - 1); i < length; i--) if(*(str + i) == c) return ((int32_t) i);
     
     return -1;
 }
 
-int_32 nextIndexOf(const char* string, const char c, const size_t index, const size_t length)
+int32_t nextIndexOf(const char* str, const char c, const size_t index, const size_t length)
 {
+    if(str == ((char*) NULL))
+    {
+        #ifdef DEBUG
+            fprintf(stderr, "Error: NULL passed to nextIndexOf.\n");
+        #endif
+
+        return false;
+    }
+
     if(index >= length)
     {
         fprintf(stderr, "Error: nextIndexOf index [%zu] is greater than or matches length %zu.\n", index, length);
@@ -120,17 +192,26 @@ int_32 nextIndexOf(const char* string, const char c, const size_t index, const s
     const size_t dest_len = (length - index);
     char* temp = (char*) malloc(dest_len * sizeof(char));
     
-    substring(temp, string, index, length, dest_len);
-    int_32 next_index = indexOf(temp, c, dest_len);
+    substring(temp, str, index, length, dest_len);
+    int32_t next_index = indexOf(temp, c, dest_len);
     
-    if(next_index != -1) next_index += ((int_32) index);
+    if(next_index != -1) next_index += ((int32_t) index);
     
     free(temp);
     return next_index;
 }
 
-int_32 prevIndexOf(const char* string, const char c, const size_t index, const size_t length)
+int32_t prevIndexOf(const char* str, const char c, const size_t index, const size_t length)
 {
+    if(str == ((char*) NULL))
+    {
+        #ifdef DEBUG
+            fprintf(stderr, "Error: NULL passed to prevIndexOf.\n");
+        #endif
+
+        return false;
+    }
+
     if(index >= length)
     {
     	#ifdef DEBUG
@@ -139,9 +220,9 @@ int_32 prevIndexOf(const char* string, const char c, const size_t index, const s
         return -1;
     }
     
-    int_32 prev_index = lastIndexOf(string, c, index);
+    int32_t prev_index = lastIndexOf(str, c, index);
     
-    if(prev_index == index) prev_index = lastIndexOf(string, c, (index - 1));
+    if(prev_index == index) prev_index = lastIndexOf(str, c, (index - 1));
     
     return prev_index;
 }
@@ -165,7 +246,7 @@ bool strtoken(char* dest, const char* src, const char seperator, size_t* index, 
     
     char* temp = (char*) malloc(dest_size * sizeof(char));
     
-    int_32 end = nextIndexOf(src, seperator, *index, src_len);
+    int32_t end = nextIndexOf(src, seperator, *index, src_len);
     
     if(end == -1) substring(temp, src, *index, src_len, dest_size);
     else substring(temp, src, *index, end, dest_size);
@@ -179,7 +260,7 @@ bool strtoken(char* dest, const char* src, const char seperator, size_t* index, 
     return true;
 }
 
-bool strfind(const char* string, const char* substring, int_32* begin, int_32* end, const size_t sub_len, const size_t length)
+bool strfind(const char* string, const char* substring, int32_t* begin, int32_t* end, const size_t sub_len, const size_t length)
 {
     if((length < sub_len) || (length == 0))
     {
@@ -198,7 +279,7 @@ bool strfind(const char* string, const char* substring, int_32* begin, int_32* e
         
         if(*begin == -1)
         {
-            if(*(string + i) == *(substring)) *begin = ((int_32) i);
+            if(*(string + i) == *(substring)) *begin = ((int32_t) i);
             continue;
         }
         
@@ -211,7 +292,7 @@ bool strfind(const char* string, const char* substring, int_32* begin, int_32* e
         }
         else if((*begin - i) >= sub_len)
         {
-            *end = (((int_32) i) + 1);
+            *end = (((int32_t) i) + 1);
             break;
         }
     }
@@ -285,7 +366,7 @@ bool strContains(const char* string, const char* string2, const size_t length, c
     if(length2 > length) return false;
     
     char ch = *string2;
-    int_32 index = (indexOf(string, ch, length) + 1), found = 1;
+    int32_t index = (indexOf(string, ch, length) + 1), found = 1;
     
     if(index == 0) return false;
     
@@ -549,13 +630,11 @@ bool strRMChar(char* dest, const char* src, const char c, const size_t dest_size
 
 /*
     Organize some text into a formatted list for output.
-
-    
 */
-void strForm(char* dest, const char* src, const char align, const uint_8 strings, const size_t dest_size, const size_t lengths[])
+void strForm(char* dest, const char* src, const char align, const uint8_t strings, const size_t dest_size, const size_t lengths[])
 {
 	size_t length = 0, largest = 0; // The total and longest string lengths.
-	int_32* index_arr = (int_32*) malloc(sizeof(int_32) * strings), index = 0, prev_index = 0; // An array to store the seperator locations
+	int32_t* index_arr = (int32_t*) malloc(sizeof(int32_t) * strings), index = 0, prev_index = 0; // An array to store the seperator locations
     char** str_arr = (char**) malloc(sizeof(char*) * strings); // A pointer to the base of an array of strings.
 	
     // Set 'length' to the total number of characters that we have been given.
@@ -583,7 +662,7 @@ void strForm(char* dest, const char* src, const char align, const uint_8 strings
         // Populate array of alignment characters
 		index_arr[i] = index;
         // Set 'index' to next alignment character.
-		index = (prev_index + lengths[i]);
+		index = (prev_index + (int32_t) lengths[i]);
         // Store this 'index' for use in next iteration.
 		prev_index = index;
 		

@@ -37,8 +37,7 @@ static inline void* betterMalloc(const size_t size)
 	if(ptr == NULL) return NULL;
 	
 	#ifdef DEBUG
-	
-	+alloc_type type = MALLOC;
+		alloc_type type = MALLOC;
 	
 	    size_t index = addPtrToTrckr(type, ptr, size);
 	    

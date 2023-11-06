@@ -13,7 +13,7 @@ bool initTerminal(void)
 	return true;
 }
 
-bool terminalFinalize(int_32 signum) {return false;}
+bool terminalFinalize(int32_t signum) {return false;}
 
 #define STDIN_FILENO _fileno(stdin)
 #define STDOUT_FILENO _fileno(stdout)

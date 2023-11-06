@@ -20,7 +20,7 @@ void newMesh(mesh* m)
 	m = (mesh*) calloc(sizeof(mesh), 1);
 
 	m->pos = ((position) empty_position);
-	m->dimensions = ((vector3) empty_vector3);
+	m->dimensions = (vector3) Vect3(0, 0, 0);
 }
 
 void setMeshPosition(mesh* m, const position pos) {m->pos = pos;}

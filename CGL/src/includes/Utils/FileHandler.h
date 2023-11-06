@@ -145,7 +145,7 @@ file* initFile(const char* name, const char* path, const ftype type, const size_
     
     if(!isValidFileType(type))
     {
-        fprintf(stderr, "Error: initFile could initialize file with invalid file type %d.\n", (uint_32) type);
+        fprintf(stderr, "Error: initFile could initialize file with invalid file type %d.\n", (uint32_t) type);
         
         return NULL_FILE_PTR;
     }

@@ -1,14 +1,20 @@
 #ifndef INPUT_THREAD_H
 #define INPUT_THREAD_H
 
-#ifdef _cplusplus
+bool addInput(char c);
+
+bool get_input = true;
+
+#ifdef __cplusplus
 extern "C"
 {
 #endif
 
+
+
 void inputLoop(void) 
 {
-    #ifdef __NO_GET_INPUT__
+    #ifdef NO_GET_INPUT
         get_input = false;
     #endif
 
@@ -17,11 +23,11 @@ void inputLoop(void)
 START:
     if(!exitThread[THREAD_INPUT])
     {
-        if(get_input) 
-        {
-            c = fgetc(stdin);
-	        addInput(c);
-        }
+        c = fgetc(stdin);
+
+
+
+        if(get_input) addInput(c);
 
         SDL_Delay(5);
 	
@@ -29,7 +35,7 @@ START:
     }
 }
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 }
 #endif
 

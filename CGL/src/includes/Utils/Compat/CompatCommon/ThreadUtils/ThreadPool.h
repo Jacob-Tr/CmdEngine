@@ -71,6 +71,10 @@ size_t getFirstEmptyPoolElement(thread_pool pool)
 		if(!thread_ptr->is_pooled_thread_assigned) return i;
 	}
 
+	#ifdef DEBUG
+		fprintf(stderr, "Warning: getFirstEmptyPoolElement did not find any thread pool elements in pool #%zu.\n", pool.pool_id);
+	#endif
+
 	return SIZE_MAX;
 } 
 
@@ -79,7 +83,7 @@ THREAD* getNextThreadFromPool(thread_pool* pool, size_t* element_id)
 	if(pool->elements >= pool->size) 
 	{
 		#ifdef DEBUG
-			fprintf(stderr, "Warning: No available threads left in thread pool. [%zu/%zu used]\n", pool->elements, pool->size);
+			fprintf(stderr, "Error: No available threads left in thread pool. [%zu/%zu used]\n", pool->elements, pool->size);
 		#endif
 
 		*element_id = UINT_MAX;
@@ -99,16 +103,16 @@ void swapPoolElements(thread_pool* pool, const size_t element_one, const size_t 
 	if(element_one >= pool->size || element_two >= pool->size) 
 	{
 		#ifdef DEBUG
-			fprintf(stderr, "Warning: Could not swap thread pool element %zu in thread pool of size %zu.\n", (element_one > element_two) ? element_one : element_two, pool->size);
+			fprintf(stderr, "Error: swapPoolElements could not swap thread pool element %zu in thread pool of size %zu.\n", (element_one > element_two) ? element_one : element_two, pool->size);
 		#endif
 
 		return;
 	}
 
 	THREAD* one = getThreadPtrFromPool(*pool, element_one), *two = getThreadPtrFromPool(*pool, element_two);
-
-	one->id = element_two;
-	two->id = element_one;
+	
+	one->id = (SDL_threadID) element_two;
+	two->id = (SDL_threadID) element_one;
 
 	*(getThreadPtrFromPool(*pool, element_one)) = *two;
 	*(getThreadPtrFromPool(*pool, element_two)) = *one;

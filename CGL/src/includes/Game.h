@@ -14,9 +14,11 @@ void exitApp(void);
 #include "includes/Game/Settings.h"
 // Load and execute ConsoleGL and game engine logic.
 #include "includes/GameEngine.h"
-// Create a usable window for displaying output.
+// Screen detail logic; text, options and menus.
+#include "includes/Game/Interface.h"
+// Create a usable window for displaying output
 #include "includes/Game/Window.h"
-// Begin executing interactive logic
+// Interactive logic.
 #include "includes/Game/GameLoop.h"
 
 #ifdef __cplusplus
@@ -25,10 +27,7 @@ extern "C"
 #endif
 
 // Set global exit_app variable to true.
-void exitGame(void) 
-{
-	exit_app = true;
-}
+void exitGame(void) {exit_app = true;}
 
 // Hide 'exit_app' from being set directly.
 #define exit_app NULL
@@ -83,6 +82,8 @@ FORCE_INLINE void exitApp(void)
     sleep(1);
     
 	#ifdef DEBUG
+		printSDLError(stderr);
+
 	    fprintf(stdout, "\n~ Processing final alloc report:\n");
 	    
 	    printAllocStats();
@@ -118,13 +119,16 @@ bool sdlInit(void)
 	if(!winInit())
 	{
 		#ifdef DEBUG
-			fprintf(stdout, "Error: Window initialization failed.\n");
+			fprintf(stderr, "Error: Window initialization failed.\n");
+			printSDLError(stderr);
 		#endif
 
 		exitApp();
 		
 		return false;
 	}
+
+	return true;
 }
 
 /*
@@ -155,8 +159,7 @@ extern FORCE_INLINE bool init(void)
 	/*
 		*DEPRECATED* Change terminal arguments in linux and load program configuration.
 	*/
-	
-	if(!(initConfig() && initTerminal()))
+	if(!initTerminal())
 	{
 		#ifdef DEBUG
 		    fprintf(stderr, "Error: Startup initialization failed.\n");
@@ -180,7 +183,7 @@ extern FORCE_INLINE bool init(void)
 	main_pool = newThreadPool(32);
 
 	/*
-		Prepare some threads for repective tasks.
+		Prepare some threads for respective tasks.
 		*To be deprecated*
 	*/
 	
@@ -232,10 +235,11 @@ extern FORCE_INLINE bool init(void)
 	    sleep(2);
 	#endif
 	
-	initChatbox(15, 10);
+	initChatbox((vector2) {15, 10});
 
 	#ifdef DEBUG
 		fprintf(stdout, "~ Initialization finished.\n");
+		printSDLError(stderr);
 	#endif
 	
 	setFPS(60);
@@ -259,13 +263,15 @@ extern void start(void)
 		return;
 	}
 
-	if(!winCreate(main_window, main_target))
+	if(!createGPUWindow(&main_window))
 	{
 		fprintf(stderr, "Error: Fatal error in window creation.\n");
 
 		exitApp();
 		return;
 	}
+
+	
 	
 	if(!startUtilityThreads())
 	{

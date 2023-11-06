@@ -29,9 +29,6 @@
     <ClInclude Include="src\includes\Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\includes\ConsoleGl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\includes\Utils\Compat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -44,10 +41,7 @@
     <ClInclude Include="src\includes\Utils\MathStrUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\includes\Utils\NumUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\includes\Utils\SafeTypes.h">
+    <ClInclude Include="src\includes\Utils\Numbers\NumUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\includes\Utils\StringUtils.h">
@@ -92,7 +86,7 @@
     <ClInclude Include="src\includes\Utils\Compat\Linux\InputConfig\TerminalSetup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\includes\Utils\Compat\CompatCommon\ThreadCommon.h">
+    <ClInclude Include="src\includes\Utils\Compat\CompatCommon\ThreadUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\includes\Utils\Compat\CompatCommon\NetworkCommon.h">
@@ -113,16 +107,10 @@
     <ClInclude Include="src\includes\Engine\Networking.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\includes\Engine\Interface.h">
+    <ClInclude Include="src\includes\Game\Interface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\includes\Engine\Audio.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\includes\Engine\World\Structures.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\includes\Engine\World\Render.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\includes\Engine\World\Position.h">
@@ -137,19 +125,7 @@
     <ClInclude Include="src\includes\Engine\World\Map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\includes\Engine\World\Entities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\includes\Engine\World\Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\includes\Engine\World\Structures\StructureUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\includes\Engine\World\Structures\Nodes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\includes\Engine\World\Structures\Nodes\NodeUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\includes\Engine\World\Physics\Motion.h">
@@ -161,9 +137,6 @@
     <ClInclude Include="src\includes\Engine\World\Map\MapPrimitives.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\includes\Engine\World\Entities\Sprites.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\includes\Engine\Threads\NetworkThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -173,55 +146,55 @@
     <ClInclude Include="src\includes\Engine\Threads\AudioThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\includes\Engine\Interface\ChatBox.h">
+    <ClInclude Include="src\includes\Game\Interface\ChatBox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\includes\Engine\Interface\Commands\Commands.h">
+    <ClInclude Include="src\includes\Game\Interface\Commands\Commands.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\includes\ConsoleGL\Visuals.h">
+    <ClInclude Include="src\includes\Engine\Visuals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\includes\ConsoleGL\Primitives.h">
+    <ClInclude Include="src\includes\Utils\Numbers\Primitives.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\includes\ConsoleGL\Config.h">
+    <ClInclude Include="src\includes\Engine\Visuals\ScreenBuffers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\includes\ConsoleGL\Visuals\Transforms.h">
+    <ClInclude Include="src\includes\Utils\Numbers\Primitives\VectorUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\includes\ConsoleGL\Visuals\ScreenBuffers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\includes\ConsoleGL\Visuals\Objects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\includes\ConsoleGL\Visuals\VisualUtils\LineUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\includes\ConsoleGL\Visuals\VisualUtils\PointUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\includes\ConsoleGL\Visuals\VisualUtils\ScreenDrawing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\includes\ConsoleGL\Primitives\VectorUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\includes\ConsoleGL\Primitives\AreaUtils.h">
+    <ClInclude Include="src\includes\Utils\Numbers\Primitives\AreaUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\includes\Game\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\includes\Engine\Windowing\WinEvents.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\includes\Utils\Compat\CompatCommon\ThreadUtils\ThreadQueue.h">
+    <ClInclude Include="src\includes\Game\Interface\Windowing\WinEvents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\includes\Utils\Compat\CompatCommon\ThreadUtils\ThreadPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\Utils\Numbers\Primitives\PrimitiveUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\Utils\Compat\SDLUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\Utils\Compat\SDLUtils\Colors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\Utils\Compat\CompatCommon\ThreadUtils\Thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\Utils\Numbers\Radians.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\Utils\Numbers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\Engine\Visuals\Textures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

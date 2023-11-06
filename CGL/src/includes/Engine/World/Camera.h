@@ -4,7 +4,7 @@
 typedef struct
 {
 	position pos;
-	int_16 map_id;
+	int16_t map_id;
 } camera;
 
 static camera main_cam;

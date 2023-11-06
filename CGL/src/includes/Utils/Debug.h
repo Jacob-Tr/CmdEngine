@@ -11,6 +11,8 @@
     static bool __print_screen__ = true;
 #endif
 
+#define printSDLError(stream) fprintf((stream), "SDL Error: <%s>.\n", SDL_GetError())
+
 #ifdef _cplusplus
 extern "C"
 {

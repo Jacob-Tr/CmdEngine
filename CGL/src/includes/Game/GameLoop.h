@@ -1,17 +1,22 @@
 #ifndef GAMELOOP_H
 #define GAMELOOP_H
 
+// This loop runs on the application thread.
 void gameLoop(void)
 {
 	print("Welcome!");
 
 	bool quit = false;
+
+	GPUWindow* win;
 	
 START:
-	fflush(stdout);
+	win = getMainWindowPtr();
+
 	pollWinEvent();
 
-	FRAME_WAIT;
+	// Wait for the specified frame-rate.
+	FRAME_WAIT; 
 	
 	if(!exit_app)
 	{
@@ -19,14 +24,14 @@ START:
 			if(!getScreenPrint()) goto START;
 		#endif
 
-        prtScr();
+        //prtScr();
+		GPU_Flip(win->target);
 	
         goto START;
 	}
 
-	printf("lol");
+	destroyGPUWindow(main_window);
 
-	SDL_DestroyWindow(main_window);
 	SDL_Quit();
 
 	exitUtilityThreads();
